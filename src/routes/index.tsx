@@ -108,8 +108,23 @@ function Index() {
     });
   }, [legs, updateLeg]);
 
-  // Compute congestion crossings per leg. Departure time defaults to "now".
-  const departure = useMemo(() => new Date(), []);
+  // Tick "now" every minute so the displayed crossing times stay current.
+  const [nowTick, setNowTick] = useState(() => new Date());
+  useEffect(() => {
+    if (departureMode !== "now") return;
+    const id = setInterval(() => setNowTick(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, [departureMode]);
+
+  const departure = useMemo(() => {
+    return departureMode === "custom" && customDeparture ? customDeparture : nowTick;
+  }, [departureMode, customDeparture, nowTick]);
+
+  const departureInPast =
+    departureMode === "custom" &&
+    customDeparture !== null &&
+    customDeparture.getTime() < Date.now() - 60_000;
+
   const legCrossings = useMemo(() => {
     return legs.map((leg) => {
       if (!leg.route) return [];
