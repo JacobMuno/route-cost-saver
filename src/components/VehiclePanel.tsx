@@ -1,6 +1,60 @@
+import { useEffect, useState } from "react";
 import { Fuel, Plug, Zap, Leaf } from "lucide-react";
 import type { VehicleConfig, VehicleType } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+function NumberField({
+  value,
+  onChange,
+  placeholder,
+  step,
+  suffix,
+  paddingRight,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  placeholder: string;
+  step: number;
+  suffix: string;
+  paddingRight: string;
+}) {
+  // Keep a local string so partial inputs ("", "0.", "1.5") don't fight React.
+  const [text, setText] = useState<string>(value > 0 ? String(value) : "");
+
+  // Sync down when the parent value changes from outside (e.g. localStorage hydrate).
+  useEffect(() => {
+    const parsed = parseFloat(text);
+    if ((isNaN(parsed) ? 0 : parsed) !== value) {
+      setText(value > 0 ? String(value) : "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  return (
+    <div className="relative mt-2">
+      <input
+        type="text"
+        inputMode="decimal"
+        value={text}
+        onChange={(e) => {
+          const raw = e.target.value.replace(",", ".");
+          if (raw !== "" && !/^\d*\.?\d*$/.test(raw)) return;
+          setText(raw);
+          const parsed = parseFloat(raw);
+          onChange(isNaN(parsed) ? 0 : parsed);
+        }}
+        placeholder={placeholder}
+        className={cn(
+          "w-full rounded-xl border border-border bg-input px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+          paddingRight,
+        )}
+      />
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+        {suffix}
+      </span>
+    </div>
+  );
+}
 
 const TYPES: { value: VehicleType; label: string; icon: typeof Fuel }[] = [
   { value: "petrol", label: "Petrol", icon: Fuel },
@@ -54,46 +108,28 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
           <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
             Consumption
           </label>
-          <div className="relative mt-2">
-            <input
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step={0.1}
-              value={vehicle.consumption || ""}
-              onChange={(e) =>
-                onChange({ ...vehicle, consumption: parseFloat(e.target.value) || 0 })
-              }
-              placeholder={isElectric ? "18" : "6.5"}
-              className="w-full rounded-xl border border-border bg-input px-3 py-2.5 pr-20 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
-              {consumptionUnit}
-            </span>
-          </div>
+          <NumberField
+            value={vehicle.consumption}
+            onChange={(n) => onChange({ ...vehicle, consumption: n })}
+            placeholder={isElectric ? "18" : "6.5"}
+            step={0.1}
+            suffix={consumptionUnit}
+            paddingRight="pr-20"
+          />
         </div>
 
         <div>
           <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
             {isElectric ? "Electricity price" : "Fuel price"}
           </label>
-          <div className="relative mt-2">
-            <input
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step={0.01}
-              value={vehicle.pricePerUnit || ""}
-              onChange={(e) =>
-                onChange({ ...vehicle, pricePerUnit: parseFloat(e.target.value) || 0 })
-              }
-              placeholder={isElectric ? "2.50" : "18.50"}
-              className="w-full rounded-xl border border-border bg-input px-3 py-2.5 pr-24 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
-              {priceUnit}
-            </span>
-          </div>
+          <NumberField
+            value={vehicle.pricePerUnit}
+            onChange={(n) => onChange({ ...vehicle, pricePerUnit: n })}
+            placeholder={isElectric ? "2.50" : "18.50"}
+            step={0.01}
+            suffix={priceUnit}
+            paddingRight="pr-24"
+          />
         </div>
       </div>
 
