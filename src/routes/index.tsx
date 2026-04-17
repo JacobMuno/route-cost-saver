@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ClientOnly } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Fuel } from "lucide-react";
+import { Fuel, AlertTriangle } from "lucide-react";
 import { LegsEditor } from "@/components/LegsEditor";
 import { TripMap } from "@/components/TripMap";
 import { VehiclePanel } from "@/components/VehiclePanel";
 import { CostSummary } from "@/components/CostSummary";
+import { DepartureTimePicker } from "@/components/DepartureTimePicker";
+import { useVehicleByType } from "@/hooks/useVehicleByType";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { getDirections } from "@/server/ors";
 import { detectCrossings } from "@/lib/congestion";
-import type { Leg, VehicleConfig } from "@/lib/types";
+import type { Leg } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -32,11 +34,26 @@ function makeLeg(): Leg {
 
 function Index() {
   const [legs, setLegs] = useState<Leg[]>(() => [makeLeg()]);
-  const [vehicle, setVehicle] = useLocalStorage<VehicleConfig>("tripcost.vehicle", {
-    type: "petrol",
-    consumption: 0,
-    pricePerUnit: 0,
-  });
+  const [vehicle, setVehicle] = useVehicleByType();
+
+  // Departure mode persists, but the chosen custom time does NOT survive a
+  // fresh app open — we always default back to "now" on load to avoid
+  // accidentally costing trips in the past.
+  const [departureMode, setDepartureMode] = useLocalStorage<"now" | "custom">(
+    "tripcost.departureMode.v1",
+    "now",
+  );
+  const [customDeparture, setCustomDeparture] = useState<Date | null>(null);
+  // Force "now" on initial app load even if last session ended in "custom".
+  const initRef = useRef(false);
+  useEffect(() => {
+    if (!initRef.current) {
+      initRef.current = true;
+      setDepartureMode("now");
+      setCustomDeparture(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateLeg = useCallback((id: string, updater: (l: Leg) => Leg) => {
     setLegs((prev) => prev.map((l) => (l.id === id ? updater(l) : l)));
@@ -91,8 +108,23 @@ function Index() {
     });
   }, [legs, updateLeg]);
 
-  // Compute congestion crossings per leg. Departure time defaults to "now".
-  const departure = useMemo(() => new Date(), []);
+  // Tick "now" every minute so the displayed crossing times stay current.
+  const [nowTick, setNowTick] = useState(() => new Date());
+  useEffect(() => {
+    if (departureMode !== "now") return;
+    const id = setInterval(() => setNowTick(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, [departureMode]);
+
+  const departure = useMemo(() => {
+    return departureMode === "custom" && customDeparture ? customDeparture : nowTick;
+  }, [departureMode, customDeparture, nowTick]);
+
+  const departureInPast =
+    departureMode === "custom" &&
+    customDeparture !== null &&
+    customDeparture.getTime() < Date.now() - 60_000;
+
   const legCrossings = useMemo(() => {
     return legs.map((leg) => {
       if (!leg.route) return [];
@@ -133,12 +165,29 @@ function Index() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
                 Your trip
               </h2>
-              <LegsEditor
-                legs={legs}
-                onUpdateLeg={updateLeg}
-                onAddLeg={addLeg}
-                onRemoveLeg={removeLeg}
-              />
+              <div className="space-y-3">
+                <DepartureTimePicker
+                  mode={departureMode}
+                  customTime={customDeparture}
+                  onChange={(m, t) => {
+                    setDepartureMode(m);
+                    setCustomDeparture(t);
+                  }}
+                />
+                {departureInPast && (
+                  <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive-foreground flex items-start gap-2">
+                    <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-destructive" />
+                    Departure time is in the past — showing charges as if the trip
+                    happened at that time.
+                  </div>
+                )}
+                <LegsEditor
+                  legs={legs}
+                  onUpdateLeg={updateLeg}
+                  onAddLeg={addLeg}
+                  onRemoveLeg={removeLeg}
+                />
+              </div>
             </section>
 
             <section className="rounded-2xl border border-border bg-card p-5">

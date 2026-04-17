@@ -54,8 +54,17 @@ type Props = {
 
 export function VehiclePanel({ vehicle, onChange }: Props) {
   const isElectric = vehicle.type === "electric";
+  const isHybrid = vehicle.type === "hybrid";
   const consumptionUnit = isElectric ? "kWh / 100 km" : "L / 100 km";
   const priceUnit = isElectric ? "SEK / kWh" : "SEK / litre";
+  const consumptionLabel = isElectric ? "Energy use" : "Consumption";
+  const consumptionPlaceholder = isElectric ? "18" : isHybrid ? "5.5" : "6.5";
+  const pricePlaceholder = isElectric ? "2.50" : "18.50";
+  const helperText = isElectric
+    ? "Find kWh/100km in your car's display or on ev-database.org. Typical range: 15–25 kWh/100km."
+    : isHybrid
+    ? "Plug-in hybrids are treated as petrol for this calculation. Enter your real-world average, not the manufacturer's combined figure (which assumes mostly EV driving)."
+    : "Find this in your owner's manual, on fuelly.com, or your car's trip computer.";
 
   return (
     <div className="space-y-4">
@@ -91,7 +100,7 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
         <div>
           <div className="flex items-baseline justify-between gap-2">
             <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-              Consumption
+              {consumptionLabel}
             </label>
             <span className="text-[10px] text-muted-foreground">{consumptionUnit}</span>
           </div>
@@ -99,7 +108,7 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
             <NumberField
               value={vehicle.consumption}
               onChange={(n) => onChange({ ...vehicle, consumption: n })}
-              placeholder={isElectric ? "18" : "6.5"}
+              placeholder={consumptionPlaceholder}
             />
           </div>
         </div>
@@ -107,7 +116,7 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
         <div>
           <div className="flex items-baseline justify-between gap-2">
             <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-              {isElectric ? "Price" : "Fuel price"}
+              {isElectric ? "Electricity" : "Fuel price"}
             </label>
             <span className="text-[10px] text-muted-foreground">{priceUnit}</span>
           </div>
@@ -115,7 +124,7 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
             <NumberField
               value={vehicle.pricePerUnit}
               onChange={(n) => onChange({ ...vehicle, pricePerUnit: n })}
-              placeholder={isElectric ? "2.50" : "18.50"}
+              placeholder={pricePlaceholder}
             />
           </div>
         </div>
@@ -123,9 +132,7 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
 
       <p className="text-xs text-muted-foreground flex items-start gap-1.5">
         <Plug className="h-3 w-3 mt-0.5 shrink-0" />
-        {vehicle.type === "hybrid"
-          ? "Hybrid mode varies — enter your real-world average L/100km. EV-only mode not yet supported."
-          : "Find this in your owner's manual, on fuelly.com, or your car's trip computer."}
+        {helperText}
       </p>
     </div>
   );
