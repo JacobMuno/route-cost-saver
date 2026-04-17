@@ -34,11 +34,26 @@ function makeLeg(): Leg {
 
 function Index() {
   const [legs, setLegs] = useState<Leg[]>(() => [makeLeg()]);
-  const [vehicle, setVehicle] = useLocalStorage<VehicleConfig>("tripcost.vehicle", {
-    type: "petrol",
-    consumption: 0,
-    pricePerUnit: 0,
-  });
+  const [vehicle, setVehicle] = useVehicleByType();
+
+  // Departure mode persists, but the chosen custom time does NOT survive a
+  // fresh app open — we always default back to "now" on load to avoid
+  // accidentally costing trips in the past.
+  const [departureMode, setDepartureMode] = useLocalStorage<"now" | "custom">(
+    "tripcost.departureMode.v1",
+    "now",
+  );
+  const [customDeparture, setCustomDeparture] = useState<Date | null>(null);
+  // Force "now" on initial app load even if last session ended in "custom".
+  const initRef = useRef(false);
+  useEffect(() => {
+    if (!initRef.current) {
+      initRef.current = true;
+      setDepartureMode("now");
+      setCustomDeparture(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateLeg = useCallback((id: string, updater: (l: Leg) => Leg) => {
     setLegs((prev) => prev.map((l) => (l.id === id ? updater(l) : l)));
