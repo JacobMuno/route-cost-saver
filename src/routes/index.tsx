@@ -91,6 +91,15 @@ function Index() {
     });
   }, [legs, updateLeg]);
 
+  // Compute congestion crossings per leg. Departure time defaults to "now".
+  const departure = useMemo(() => new Date(), []);
+  const legCrossings = useMemo(() => {
+    return legs.map((leg) => {
+      if (!leg.route) return [];
+      return detectCrossings(leg.route.coordinates, departure, leg.route.durationMin);
+    });
+  }, [legs, departure]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
