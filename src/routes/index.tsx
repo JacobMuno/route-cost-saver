@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ClientOnly } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Fuel } from "lucide-react";
 import { LegsEditor } from "@/components/LegsEditor";
 import { TripMap } from "@/components/TripMap";
@@ -8,6 +8,7 @@ import { VehiclePanel } from "@/components/VehiclePanel";
 import { CostSummary } from "@/components/CostSummary";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { getDirections } from "@/server/ors";
+import { detectCrossings } from "@/lib/congestion";
 import type { Leg, VehicleConfig } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
@@ -90,6 +91,15 @@ function Index() {
     });
   }, [legs, updateLeg]);
 
+  // Compute congestion crossings per leg. Departure time defaults to "now".
+  const departure = useMemo(() => new Date(), []);
+  const legCrossings = useMemo(() => {
+    return legs.map((leg) => {
+      if (!leg.route) return [];
+      return detectCrossings(leg.route.coordinates, departure, leg.route.durationMin);
+    });
+  }, [legs, departure]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
@@ -114,7 +124,7 @@ function Index() {
           {/* Map first on mobile, right on desktop */}
           <div className="order-1 lg:order-2 h-[300px] sm:h-[400px] lg:h-[calc(100vh-8rem)] lg:sticky lg:top-4">
             <ClientOnly fallback={<div className="h-full w-full rounded-2xl bg-muted animate-pulse" />}>
-              <TripMap legs={legs} />
+              <TripMap legs={legs} legCrossings={legCrossings} />
             </ClientOnly>
           </div>
 
@@ -138,7 +148,7 @@ function Index() {
               <VehiclePanel vehicle={vehicle} onChange={setVehicle} />
             </section>
 
-            <CostSummary legs={legs} vehicle={vehicle} />
+            <CostSummary legs={legs} vehicle={vehicle} legCrossings={legCrossings} />
           </div>
         </div>
       </main>
