@@ -165,12 +165,29 @@ function Index() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
                 Your trip
               </h2>
-              <LegsEditor
-                legs={legs}
-                onUpdateLeg={updateLeg}
-                onAddLeg={addLeg}
-                onRemoveLeg={removeLeg}
-              />
+              <div className="space-y-3">
+                <DepartureTimePicker
+                  mode={departureMode}
+                  customTime={customDeparture}
+                  onChange={(m, t) => {
+                    setDepartureMode(m);
+                    setCustomDeparture(t);
+                  }}
+                />
+                {departureInPast && (
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200 flex items-start gap-2">
+                    <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    Departure time is in the past — showing charges as if the trip
+                    happened at that time.
+                  </div>
+                )}
+                <LegsEditor
+                  legs={legs}
+                  onUpdateLeg={updateLeg}
+                  onAddLeg={addLeg}
+                  onRemoveLeg={removeLeg}
+                />
+              </div>
             </section>
 
             <section className="rounded-2xl border border-border bg-card p-5">
