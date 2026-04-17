@@ -153,7 +153,8 @@ export function detectCrossings(
       const direction = inferDirection(segStart, segEnd, cp);
       const schedule = pickSchedule(zone.city, time, zone.schedules);
       const range = schedule ? findRange(time, schedule) : null;
-      const charge = range ? chargeFor(direction, range) : 0;
+      // No charge on weekends, July, public holidays, or the weekday before a holiday.
+      const charge = range && isChargingDay(time) ? chargeFor(direction, range) : 0;
 
       crossings.push({
         city: zone.city,
