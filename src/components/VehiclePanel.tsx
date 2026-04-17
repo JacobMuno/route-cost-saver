@@ -54,8 +54,17 @@ type Props = {
 
 export function VehiclePanel({ vehicle, onChange }: Props) {
   const isElectric = vehicle.type === "electric";
+  const isHybrid = vehicle.type === "hybrid";
   const consumptionUnit = isElectric ? "kWh / 100 km" : "L / 100 km";
   const priceUnit = isElectric ? "SEK / kWh" : "SEK / litre";
+  const consumptionLabel = isElectric ? "Energy use" : "Consumption";
+  const consumptionPlaceholder = isElectric ? "18" : isHybrid ? "5.5" : "6.5";
+  const pricePlaceholder = isElectric ? "2.50" : "18.50";
+  const helperText = isElectric
+    ? "Find kWh/100km in your car's display or on ev-database.org. Typical range: 15–25 kWh/100km."
+    : isHybrid
+    ? "Plug-in hybrids are treated as petrol for this calculation. Enter your real-world average, not the manufacturer's combined figure (which assumes mostly EV driving)."
+    : "Find this in your owner's manual, on fuelly.com, or your car's trip computer.";
 
   return (
     <div className="space-y-4">
