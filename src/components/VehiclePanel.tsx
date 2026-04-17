@@ -7,21 +7,13 @@ function NumberField({
   value,
   onChange,
   placeholder,
-  step,
-  suffix,
-  paddingRight,
 }: {
   value: number;
   onChange: (n: number) => void;
   placeholder: string;
-  step: number;
-  suffix: string;
-  paddingRight: string;
 }) {
-  // Keep a local string so partial inputs ("", "0.", "1.5") don't fight React.
   const [text, setText] = useState<string>(value > 0 ? String(value) : "");
 
-  // Sync down when the parent value changes from outside (e.g. localStorage hydrate).
   useEffect(() => {
     const parsed = parseFloat(text);
     if ((isNaN(parsed) ? 0 : parsed) !== value) {
@@ -31,28 +23,20 @@ function NumberField({
   }, [value]);
 
   return (
-    <div className="relative mt-2">
-      <input
-        type="text"
-        inputMode="decimal"
-        value={text}
-        onChange={(e) => {
-          const raw = e.target.value.replace(",", ".");
-          if (raw !== "" && !/^\d*\.?\d*$/.test(raw)) return;
-          setText(raw);
-          const parsed = parseFloat(raw);
-          onChange(isNaN(parsed) ? 0 : parsed);
-        }}
-        placeholder={placeholder}
-        className={cn(
-          "w-full rounded-xl border border-border bg-input px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-          paddingRight,
-        )}
-      />
-      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
-        {suffix}
-      </span>
-    </div>
+    <input
+      type="text"
+      inputMode="decimal"
+      value={text}
+      onChange={(e) => {
+        const raw = e.target.value.replace(",", ".");
+        if (raw !== "" && !/^\d*\.?\d*$/.test(raw)) return;
+        setText(raw);
+        const parsed = parseFloat(raw);
+        onChange(isNaN(parsed) ? 0 : parsed);
+      }}
+      placeholder={placeholder}
+      className="w-full rounded-xl border border-border bg-input px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+    />
   );
 }
 
