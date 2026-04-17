@@ -115,7 +115,7 @@ function Index() {
           {/* Map first on mobile, right on desktop */}
           <div className="order-1 lg:order-2 h-[300px] sm:h-[400px] lg:h-[calc(100vh-8rem)] lg:sticky lg:top-4">
             <ClientOnly fallback={<div className="h-full w-full rounded-2xl bg-muted animate-pulse" />}>
-              <TripMap legs={legs} />
+              <TripMap legs={legs} legCrossings={legCrossings} />
             </ClientOnly>
           </div>
 
@@ -139,7 +139,7 @@ function Index() {
               <VehiclePanel vehicle={vehicle} onChange={setVehicle} />
             </section>
 
-            <CostSummary legs={legs} vehicle={vehicle} />
+            <CostSummary legs={legs} vehicle={vehicle} legCrossings={legCrossings} />
           </div>
         </div>
       </main>
