@@ -1,26 +1,147 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ClientOnly } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Fuel } from "lucide-react";
+import { LegsEditor } from "@/components/LegsEditor";
+import { TripMap } from "@/components/TripMap";
+import { VehiclePanel } from "@/components/VehiclePanel";
+import { CostSummary } from "@/components/CostSummary";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { getDirections } from "@/server/ors";
+import type { Leg, VehicleConfig } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+function emptyLoc() {
+  return { query: "", point: null, label: null };
+}
+
+function makeLeg(): Leg {
+  return {
+    id: crypto.randomUUID(),
+    origin: emptyLoc(),
+    destination: emptyLoc(),
+    waypoints: [],
+    route: null,
+    status: "idle",
+  };
 }
 
 function Index() {
-  return <PlaceholderIndex />;
+  const [legs, setLegs] = useState<Leg[]>(() => [makeLeg()]);
+  const [vehicle, setVehicle] = useLocalStorage<VehicleConfig>("tripcost.vehicle", {
+    type: "petrol",
+    consumption: 0,
+    pricePerUnit: 0,
+  });
+
+  const updateLeg = useCallback((id: string, updater: (l: Leg) => Leg) => {
+    setLegs((prev) => prev.map((l) => (l.id === id ? updater(l) : l)));
+  }, []);
+
+  const addLeg = useCallback(() => {
+    setLegs((prev) => [...prev, makeLeg()]);
+  }, []);
+
+  const removeLeg = useCallback((id: string) => {
+    setLegs((prev) => prev.filter((l) => l.id !== id));
+  }, []);
+
+  // Fetch routes whenever leg points are complete.
+  const fetchedKeyRef = useRef<Map<string, string>>(new Map());
+  useEffect(() => {
+    legs.forEach((leg) => {
+      const points = [leg.origin, ...leg.waypoints, leg.destination]
+        .map((s) => s.point)
+        .filter((p): p is { lat: number; lng: number } => p !== null);
+      if (points.length < 2) return;
+      const key = points.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join("|");
+      if (fetchedKeyRef.current.get(leg.id) === key) return;
+      fetchedKeyRef.current.set(leg.id, key);
+
+      updateLeg(leg.id, (l) => ({ ...l, status: "loading", error: undefined }));
+      getDirections({ data: { points } })
+        .then((res) => {
+          if (res.error || !res.route) {
+            updateLeg(leg.id, (l) => ({
+              ...l,
+              status: "error",
+              error: res.error ?? "Could not calculate route.",
+              route: null,
+            }));
+            return;
+          }
+          updateLeg(leg.id, (l) => ({
+            ...l,
+            status: "ready",
+            route: res.route,
+          }));
+        })
+        .catch(() => {
+          updateLeg(leg.id, (l) => ({
+            ...l,
+            status: "error",
+            error: "Could not calculate route. Check addresses and try again.",
+            route: null,
+          }));
+        });
+    });
+  }, [legs, updateLeg]);
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border">
+        <div className="mx-auto max-w-7xl px-4 py-4 flex items-center gap-3">
+          <div
+            className="h-9 w-9 rounded-xl flex items-center justify-center"
+            style={{ background: "var(--gradient-hero)" }}
+          >
+            <Fuel className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-base font-bold tracking-tight">Trip Cost Calculator</h1>
+            <p className="text-xs text-muted-foreground">
+              Fuel & charging costs in Sweden
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-4 py-4 lg:py-6">
+        <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+          {/* Map first on mobile, right on desktop */}
+          <div className="order-1 lg:order-2 h-[300px] sm:h-[400px] lg:h-[calc(100vh-8rem)] lg:sticky lg:top-4">
+            <ClientOnly fallback={<div className="h-full w-full rounded-2xl bg-muted animate-pulse" />}>
+              <TripMap legs={legs} />
+            </ClientOnly>
+          </div>
+
+          <div className="order-2 lg:order-1 space-y-4">
+            <section>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                Your trip
+              </h2>
+              <LegsEditor
+                legs={legs}
+                onUpdateLeg={updateLeg}
+                onAddLeg={addLeg}
+                onRemoveLeg={removeLeg}
+              />
+            </section>
+
+            <section className="rounded-2xl border border-border bg-card p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                Your vehicle
+              </h2>
+              <VehiclePanel vehicle={vehicle} onChange={setVehicle} />
+            </section>
+
+            <CostSummary legs={legs} vehicle={vehicle} />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 }
