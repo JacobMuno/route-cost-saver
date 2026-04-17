@@ -16,6 +16,7 @@ import {
   type RateSchedule,
   type TimeRange,
 } from "./congestion-zones";
+import { isChargingDay } from "./swedishHolidays";
 
 export type Crossing = {
   city: "Stockholm" | "Gothenburg";
