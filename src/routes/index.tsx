@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ClientOnly } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Fuel } from "lucide-react";
 import { LegsEditor } from "@/components/LegsEditor";
 import { TripMap } from "@/components/TripMap";
@@ -8,6 +8,7 @@ import { VehiclePanel } from "@/components/VehiclePanel";
 import { CostSummary } from "@/components/CostSummary";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { getDirections } from "@/server/ors";
+import { detectCrossings } from "@/lib/congestion";
 import type { Leg, VehicleConfig } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
