@@ -89,31 +89,35 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-            Consumption
-          </label>
-          <NumberField
-            value={vehicle.consumption}
-            onChange={(n) => onChange({ ...vehicle, consumption: n })}
-            placeholder={isElectric ? "18" : "6.5"}
-            step={0.1}
-            suffix={consumptionUnit}
-            paddingRight="pr-20"
-          />
+          <div className="flex items-baseline justify-between gap-2">
+            <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+              Consumption
+            </label>
+            <span className="text-[10px] text-muted-foreground">{consumptionUnit}</span>
+          </div>
+          <div className="mt-2">
+            <NumberField
+              value={vehicle.consumption}
+              onChange={(n) => onChange({ ...vehicle, consumption: n })}
+              placeholder={isElectric ? "18" : "6.5"}
+            />
+          </div>
         </div>
 
         <div>
-          <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-            {isElectric ? "Electricity price" : "Fuel price"}
-          </label>
-          <NumberField
-            value={vehicle.pricePerUnit}
-            onChange={(n) => onChange({ ...vehicle, pricePerUnit: n })}
-            placeholder={isElectric ? "2.50" : "18.50"}
-            step={0.01}
-            suffix={priceUnit}
-            paddingRight="pr-24"
-          />
+          <div className="flex items-baseline justify-between gap-2">
+            <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+              {isElectric ? "Price" : "Fuel price"}
+            </label>
+            <span className="text-[10px] text-muted-foreground">{priceUnit}</span>
+          </div>
+          <div className="mt-2">
+            <NumberField
+              value={vehicle.pricePerUnit}
+              onChange={(n) => onChange({ ...vehicle, pricePerUnit: n })}
+              placeholder={isElectric ? "2.50" : "18.50"}
+            />
+          </div>
         </div>
       </div>
 
