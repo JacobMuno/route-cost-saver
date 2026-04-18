@@ -287,37 +287,47 @@ const STOCKHOLM_CPS: ControlPoint[] = [
   },
 ];
 
-const STOCKHOLM_HIGH: RateSchedule = {
-  effectiveFrom: "2024-01-01",
-  effectiveTo: null,
+/**
+ * Stockholm inner-city tariff (per passage, SEK).
+ * Source: Transportstyrelsen — last verified 2026-04-18.
+ * https://www.transportstyrelsen.se/sv/vagtrafik/Trangselskatt/Trangselskatt-i-stockholm/
+ */
+export const STOCKHOLM_INNER_SCHEDULE: RateSchedule = {
+  key: "stockholm-inner",
+  city: "Stockholm",
+  seasonality: "seasonal",
   timeRanges: [
-    { start: "06:00", end: "06:30", weekdayOnly: true, priceInbound: 15, priceOutbound: 15 },
-    { start: "06:30", end: "07:00", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "07:00", end: "08:30", weekdayOnly: true, priceInbound: 45, priceOutbound: 45 },
-    { start: "08:30", end: "09:00", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "09:00", end: "15:00", weekdayOnly: true, priceInbound: 15, priceOutbound: 15 },
-    { start: "15:00", end: "15:30", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "15:30", end: "17:00", weekdayOnly: true, priceInbound: 45, priceOutbound: 45 },
-    { start: "17:00", end: "17:30", weekdayOnly: true, priceInbound: 35, priceOutbound: 35 },
-    { start: "17:30", end: "18:00", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "18:00", end: "18:30", weekdayOnly: true, priceInbound: 15, priceOutbound: 15 },
+    { startMinute: 6 * 60, endMinute: 6 * 60 + 30, amountHighSeason: 15, amountLowSeason: 15 },
+    { startMinute: 6 * 60 + 30, endMinute: 7 * 60, amountHighSeason: 30, amountLowSeason: 25 },
+    { startMinute: 7 * 60, endMinute: 8 * 60 + 30, amountHighSeason: 45, amountLowSeason: 35 },
+    { startMinute: 8 * 60 + 30, endMinute: 9 * 60, amountHighSeason: 30, amountLowSeason: 25 },
+    { startMinute: 9 * 60, endMinute: 9 * 60 + 30, amountHighSeason: 20, amountLowSeason: 15 },
+    { startMinute: 9 * 60 + 30, endMinute: 15 * 60, amountHighSeason: 11, amountLowSeason: 11 },
+    { startMinute: 15 * 60, endMinute: 15 * 60 + 30, amountHighSeason: 20, amountLowSeason: 15 },
+    { startMinute: 15 * 60 + 30, endMinute: 16 * 60, amountHighSeason: 30, amountLowSeason: 25 },
+    { startMinute: 16 * 60, endMinute: 17 * 60 + 30, amountHighSeason: 45, amountLowSeason: 35 },
+    { startMinute: 17 * 60 + 30, endMinute: 18 * 60, amountHighSeason: 30, amountLowSeason: 25 },
+    { startMinute: 18 * 60, endMinute: 18 * 60 + 30, amountHighSeason: 20, amountLowSeason: 15 },
   ],
 };
 
-const STOCKHOLM_LOW: RateSchedule = {
-  effectiveFrom: "2024-01-01",
-  effectiveTo: null,
+/** Stockholm Essingeleden (E4) tariff (per passage, SEK). */
+export const STOCKHOLM_ESSINGELEDEN_SCHEDULE: RateSchedule = {
+  key: "stockholm-essingeleden",
+  city: "Stockholm",
+  seasonality: "seasonal",
   timeRanges: [
-    { start: "06:00", end: "06:30", weekdayOnly: true, priceInbound: 15, priceOutbound: 15 },
-    { start: "06:30", end: "07:00", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "07:00", end: "08:30", weekdayOnly: true, priceInbound: 35, priceOutbound: 35 },
-    { start: "08:30", end: "09:00", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "09:00", end: "15:00", weekdayOnly: true, priceInbound: 15, priceOutbound: 15 },
-    { start: "15:00", end: "15:30", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "15:30", end: "17:00", weekdayOnly: true, priceInbound: 35, priceOutbound: 35 },
-    { start: "17:00", end: "17:30", weekdayOnly: true, priceInbound: 25, priceOutbound: 25 },
-    { start: "17:30", end: "18:00", weekdayOnly: true, priceInbound: 20, priceOutbound: 20 },
-    { start: "18:00", end: "18:30", weekdayOnly: true, priceInbound: 15, priceOutbound: 15 },
+    { startMinute: 6 * 60, endMinute: 6 * 60 + 30, amountHighSeason: 15, amountLowSeason: 15 },
+    { startMinute: 6 * 60 + 30, endMinute: 7 * 60, amountHighSeason: 27, amountLowSeason: 22 },
+    { startMinute: 7 * 60, endMinute: 8 * 60 + 30, amountHighSeason: 40, amountLowSeason: 30 },
+    { startMinute: 8 * 60 + 30, endMinute: 9 * 60, amountHighSeason: 27, amountLowSeason: 22 },
+    { startMinute: 9 * 60, endMinute: 9 * 60 + 30, amountHighSeason: 20, amountLowSeason: 15 },
+    { startMinute: 9 * 60 + 30, endMinute: 15 * 60, amountHighSeason: 11, amountLowSeason: 11 },
+    { startMinute: 15 * 60, endMinute: 15 * 60 + 30, amountHighSeason: 20, amountLowSeason: 15 },
+    { startMinute: 15 * 60 + 30, endMinute: 16 * 60, amountHighSeason: 27, amountLowSeason: 22 },
+    { startMinute: 16 * 60, endMinute: 17 * 60 + 30, amountHighSeason: 40, amountLowSeason: 30 },
+    { startMinute: 17 * 60 + 30, endMinute: 18 * 60, amountHighSeason: 27, amountLowSeason: 22 },
+    { startMinute: 18 * 60, endMinute: 18 * 60 + 30, amountHighSeason: 20, amountLowSeason: 15 },
   ],
 };
 
