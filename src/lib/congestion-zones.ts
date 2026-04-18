@@ -94,6 +94,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.314462, lng: 18.103903 },
     },
     inboundVector: { dx: -0.9155, dy: 0.4024 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Ekelundsbron",
@@ -102,6 +103,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.340088, lng: 18.012716 },
     },
     inboundVector: { dx: 0.98, dy: -0.1992 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Klarastrandsleden",
@@ -110,6 +112,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.338264, lng: 18.029668 },
     },
     inboundVector: { dx: 0.9712, dy: -0.2382 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Tomtebodavägen",
@@ -118,6 +121,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.343206, lng: 18.025806 },
     },
     inboundVector: { dx: 0.9469, dy: -0.3215 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Solnabron",
@@ -126,6 +130,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.346206, lng: 18.031731 },
     },
     inboundVector: { dx: 0.9024, dy: -0.431 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Tpl Norrtull",
@@ -134,6 +139,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.349536, lng: 18.042365 },
     },
     inboundVector: { dx: 0.7779, dy: -0.6284 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Skansbron",
@@ -142,6 +148,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.304243, lng: 18.080393 },
     },
     inboundVector: { dx: -0.3937, dy: 0.9192 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Tpl Ekhagen",
@@ -150,6 +157,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.370136, lng: 18.049881 },
     },
     inboundVector: { dx: 0.3969, dy: -0.9179 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Tpl Frescati",
@@ -158,6 +166,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.365403, lng: 18.051495 },
     },
     inboundVector: { dx: 0.406, dy: -0.9139 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Tpl Universitetet",
@@ -166,6 +175,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.362841, lng: 18.053938 },
     },
     inboundVector: { dx: 0.3758, dy: -0.9267 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Tpl Roslagstull",
@@ -174,6 +184,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.352410, lng: 18.057401 },
     },
     inboundVector: { dx: 0.4017, dy: -0.9158 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Värtan",
@@ -182,6 +193,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.352177, lng: 18.101036 },
     },
     inboundVector: { dx: -0.8273, dy: -0.5618 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Ropsten",
@@ -190,6 +202,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.357202, lng: 18.103075 },
     },
     inboundVector: { dx: -0.7876, dy: -0.6161 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Hagastaden",
@@ -198,6 +211,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.347202, lng: 18.032564 },
     },
     inboundVector: { dx: 0.8883, dy: -0.4593 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Hälsingegatan",
@@ -206,6 +220,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.348610, lng: 18.035673 },
     },
     inboundVector: { dx: 0.8535, dy: -0.5212 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Skanstullsbron",
@@ -214,6 +229,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.306510, lng: 18.078353 },
     },
     inboundVector: { dx: -0.3564, dy: 0.9343 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Johanneshovsbron",
@@ -222,6 +238,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.303967, lng: 18.078129 },
     },
     inboundVector: { dx: -0.3171, dy: 0.9484 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Liljeholmsbron",
@@ -230,6 +247,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.311208, lng: 18.029454 },
     },
     inboundVector: { dx: 0.9137, dy: 0.4063 },
+    tariff: "stockholm-inner",
   },
   {
     name: "Stora Essingen",
@@ -238,6 +256,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.322080, lng: 17.996613 },
     },
     inboundVector: { dx: 0.9957, dy: 0.0923 },
+    tariff: "stockholm-essingeleden",
   },
   {
     name: "Lilla Essingen",
@@ -246,6 +265,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.324575, lng: 18.004058 },
     },
     inboundVector: { dx: 0.9979, dy: 0.0647 },
+    tariff: "stockholm-essingeleden",
   },
   {
     name: "Tpl Fredhäll/Drottningsholmsvägen",
@@ -254,6 +274,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.331350, lng: 18.010188 },
     },
     inboundVector: { dx: 0.999, dy: -0.0443 },
+    tariff: "stockholm-essingeleden",
   },
   {
     name: "Tpl Kristineberg",
@@ -262,6 +283,7 @@ const STOCKHOLM_CPS: ControlPoint[] = [
       b: { lat: 59.334488, lng: 18.010072 },
     },
     inboundVector: { dx: 0.9952, dy: -0.0975 },
+    tariff: "stockholm-essingeleden",
   },
 ];
 
@@ -317,6 +339,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.682675, lng: 11.988521 },
     },
     inboundVector: { dx: -0.4414, dy: 0.8973 },
+    tariff: "gothenburg",
   },
   {
     name: "Emigrantvägen",
@@ -325,6 +348,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.699615, lng: 11.936059 },
     },
     inboundVector: { dx: 0.9754, dy: 0.2204 },
+    tariff: "gothenburg",
   },
   {
     name: "Älvsborgsbron",
@@ -333,6 +357,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.694425, lng: 11.899241 },
     },
     inboundVector: { dx: 0.9834, dy: 0.1815 },
+    tariff: "gothenburg",
   },
   {
     name: "Lindholmsallén",
@@ -341,6 +366,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.707180, lng: 11.935843 },
     },
     inboundVector: { dx: 0.9995, dy: 0.0304 },
+    tariff: "gothenburg",
   },
   {
     name: "Karlavagnsgatan västra",
@@ -349,6 +375,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.707681, lng: 11.935251 },
     },
     inboundVector: { dx: 0.9999, dy: 0.0173 },
+    tariff: "gothenburg",
   },
   {
     name: "Polstjärnegatan",
@@ -357,6 +384,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.710436, lng: 11.936835 },
     },
     inboundVector: { dx: 0.9985, dy: -0.0549 },
+    tariff: "gothenburg",
   },
   {
     name: "Karlavagnsgatan östra",
@@ -365,6 +393,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.711379, lng: 11.942950 },
     },
     inboundVector: { dx: 0.9955, dy: -0.0951 },
+    tariff: "gothenburg",
   },
   {
     name: "Hjalmar Brantingsgatan",
@@ -373,6 +402,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.719906, lng: 11.957964 },
     },
     inboundVector: { dx: 0.8142, dy: -0.5806 },
+    tariff: "gothenburg",
   },
   {
     name: "Södra Tagenevägen",
@@ -381,6 +411,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.759380, lng: 11.987665 },
     },
     inboundVector: { dx: -0.2686, dy: -0.9632 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Skälltorpsvägen",
@@ -389,6 +421,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.758366, lng: 11.988690 },
     },
     inboundVector: { dx: -0.292, dy: -0.9564 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Backadalen",
@@ -397,6 +431,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.747777, lng: 11.987979 },
     },
     inboundVector: { dx: -0.3472, dy: -0.9378 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Gibraltargatan",
@@ -405,6 +441,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.683179, lng: 11.985436 },
     },
     inboundVector: { dx: -0.3567, dy: 0.9342 },
+    tariff: "gothenburg",
   },
   {
     name: "Tingstadsmotet avfart E6",
@@ -413,6 +450,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.732210, lng: 11.982375 },
     },
     inboundVector: { dx: -0.3529, dy: -0.9357 },
+    tariff: "gothenburg",
   },
   {
     name: "Tingstadvägen",
@@ -421,6 +459,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.731126, lng: 11.981327 },
     },
     inboundVector: { dx: -0.329, dy: -0.9443 },
+    tariff: "gothenburg",
   },
   {
     name: "Ringömotet",
@@ -429,6 +468,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.725271, lng: 11.979862 },
     },
     inboundVector: { dx: -0.3581, dy: -0.9337 },
+    tariff: "gothenburg",
   },
   {
     name: "Salsmästaregatan",
@@ -437,6 +477,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.724322, lng: 11.983806 },
     },
     inboundVector: { dx: -0.5533, dy: -0.833 },
+    tariff: "gothenburg",
   },
   {
     name: "Marieholmsgatan",
@@ -445,6 +486,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.721166, lng: 11.990173 },
     },
     inboundVector: { dx: -0.807, dy: -0.5905 },
+    tariff: "gothenburg",
   },
   {
     name: "E45 Marieholmsleden",
@@ -453,6 +495,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.720515, lng: 11.993430 },
     },
     inboundVector: { dx: -0.8663, dy: -0.4995 },
+    tariff: "gothenburg",
   },
   {
     name: "Partihandelsgatan",
@@ -461,6 +504,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.719097, lng: 11.994113 },
     },
     inboundVector: { dx: -0.8992, dy: -0.4376 },
+    tariff: "gothenburg",
   },
   {
     name: "E20 Alingsåsleden",
@@ -469,6 +513,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.717300, lng: 11.996568 },
     },
     inboundVector: { dx: -0.9427, dy: -0.3336 },
+    tariff: "gothenburg",
   },
   {
     name: "Olskroksmotet avfart E20",
@@ -477,6 +522,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.715755, lng: 11.994755 },
     },
     inboundVector: { dx: -0.9552, dy: -0.2961 },
+    tariff: "gothenburg",
   },
   {
     name: "Olskroksmotet påfart E6",
@@ -485,6 +531,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.715307, lng: 11.994667 },
     },
     inboundVector: { dx: -0.9606, dy: -0.278 },
+    tariff: "gothenburg",
   },
   {
     name: "Doktor Allards gata",
@@ -493,6 +540,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.681655, lng: 11.979670 },
     },
     inboundVector: { dx: -0.1474, dy: 0.9891 },
+    tariff: "gothenburg",
   },
   {
     name: "Redbergsvägen",
@@ -501,6 +549,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.714424, lng: 11.994568 },
     },
     inboundVector: { dx: -0.9707, dy: -0.2402 },
+    tariff: "gothenburg",
   },
   {
     name: "Willinsbron",
@@ -509,6 +558,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.709797, lng: 11.997047 },
     },
     inboundVector: { dx: -0.9999, dy: -0.0159 },
+    tariff: "gothenburg",
   },
   {
     name: "Örgrytevägen",
@@ -517,6 +567,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.698282, lng: 11.997715 },
     },
     inboundVector: { dx: -0.8981, dy: 0.4398 },
+    tariff: "gothenburg",
   },
   {
     name: "Kungsbackaleden",
@@ -525,6 +576,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.689547, lng: 12.001546 },
     },
     inboundVector: { dx: -0.7996, dy: 0.6006 },
+    tariff: "gothenburg",
   },
   {
     name: "Sankt Sigfridsgatan",
@@ -533,6 +585,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.689763, lng: 12.005486 },
     },
     inboundVector: { dx: -0.8401, dy: 0.5424 },
+    tariff: "gothenburg",
   },
   {
     name: "Mölndalsvägen",
@@ -541,6 +594,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.685436, lng: 12.000115 },
     },
     inboundVector: { dx: -0.721, dy: 0.693 },
+    tariff: "gothenburg",
   },
   {
     name: "Marieholmstunneln avfart E6 norr",
@@ -549,6 +603,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.728527, lng: 11.985841 },
     },
     inboundVector: { dx: -0.5303, dy: -0.8478 },
+    tariff: "gothenburg",
   },
   {
     name: "Marieholmstunneln påfart E6 norr",
@@ -557,6 +612,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.728931, lng: 11.986131 },
     },
     inboundVector: { dx: -0.5314, dy: -0.8471 },
+    tariff: "gothenburg",
   },
   {
     name: "Ehrenströmsgatan",
@@ -565,6 +621,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.679078, lng: 11.969662 },
     },
     inboundVector: { dx: 0.1956, dy: 0.9807 },
+    tariff: "gothenburg",
   },
   {
     name: "Dag Hammarskjöldsleden",
@@ -573,6 +630,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.677636, lng: 11.942961 },
     },
     inboundVector: { dx: 0.7232, dy: 0.6906 },
+    tariff: "gothenburg",
   },
   {
     name: "Margaretebergsgatan",
@@ -581,6 +639,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.680433, lng: 11.943881 },
     },
     inboundVector: { dx: 0.7455, dy: 0.6665 },
+    tariff: "gothenburg",
   },
   {
     name: "Fjällgatan/Jungmansgatan",
@@ -589,6 +648,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.695639, lng: 11.946006 },
     },
     inboundVector: { dx: 0.9152, dy: 0.4029 },
+    tariff: "gothenburg",
   },
   {
     name: "Stigbergsliden",
@@ -597,6 +657,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.698959, lng: 11.936822 },
     },
     inboundVector: { dx: 0.9707, dy: 0.2404 },
+    tariff: "gothenburg",
   },
   {
     name: "E45 Oscarsleden",
@@ -605,6 +666,7 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.699476, lng: 11.936095 },
     },
     inboundVector: { dx: 0.9746, dy: 0.2239 },
+    tariff: "gothenburg",
   },
   {
     name: "Bäcktuvevägen",
@@ -613,6 +675,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.738479, lng: 11.940342 },
     },
     inboundVector: { dx: 0.746, dy: -0.6659 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Tuvevägen",
@@ -621,6 +685,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.738506, lng: 11.940726 },
     },
     inboundVector: { dx: 0.7419, dy: -0.6706 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Minelundsvägen",
@@ -629,6 +695,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.729327, lng: 11.952341 },
     },
     inboundVector: { dx: 0.7194, dy: -0.6946 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Deltavägen",
@@ -637,6 +705,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.728078, lng: 11.953409 },
     },
     inboundVector: { dx: 0.7233, dy: -0.6906 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Backavägen In",
@@ -645,6 +715,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.726021, lng: 11.959503 },
     },
     inboundVector: { dx: 0.634, dy: -0.7733 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
   {
     name: "Backavägen Ut",
@@ -653,6 +725,8 @@ const GOTHENBURG_CPS: ControlPoint[] = [
       b: { lat: 57.726048, lng: 11.959316 },
     },
     inboundVector: { dx: 0.6384, dy: -0.7697 },
+    tariff: "gothenburg",
+    backaArea: true,
   },
 ];
 
