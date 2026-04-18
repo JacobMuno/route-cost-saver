@@ -740,28 +740,89 @@ const GOTHENBURG_CPS: ControlPoint[] = [
   },
 ];
 
-const GOTHENBURG_SCHEDULE: RateSchedule = {
-  effectiveFrom: "2024-01-01",
-  effectiveTo: null,
+/**
+ * Gothenburg year-round tariff (per passage, SEK).
+ * Source: Transportstyrelsen — last verified 2026-04-18.
+ * https://www.transportstyrelsen.se/sv/vagtrafik/Trangselskatt/Trangselskatt-i-goteborg/
+ */
+export const GOTHENBURG_SCHEDULE: RateSchedule = {
+  key: "gothenburg",
+  city: "Gothenburg",
+  seasonality: "year-round",
   timeRanges: [
-    { start: "06:00", end: "06:30", weekdayOnly: true, priceInbound: 9, priceOutbound: 9 },
-    { start: "06:30", end: "07:00", weekdayOnly: true, priceInbound: 16, priceOutbound: 16 },
-    { start: "07:00", end: "08:00", weekdayOnly: true, priceInbound: 22, priceOutbound: 22 },
-    { start: "08:00", end: "08:30", weekdayOnly: true, priceInbound: 16, priceOutbound: 16 },
-    { start: "08:30", end: "15:00", weekdayOnly: true, priceInbound: 9, priceOutbound: 9 },
-    { start: "15:00", end: "15:30", weekdayOnly: true, priceInbound: 16, priceOutbound: 16 },
-    { start: "15:30", end: "17:00", weekdayOnly: true, priceInbound: 22, priceOutbound: 22 },
-    { start: "17:00", end: "18:00", weekdayOnly: true, priceInbound: 16, priceOutbound: 16 },
-    { start: "18:00", end: "18:30", weekdayOnly: true, priceInbound: 9, priceOutbound: 9 },
+    { startMinute: 6 * 60, endMinute: 6 * 60 + 30, amount: 9 },
+    { startMinute: 6 * 60 + 30, endMinute: 7 * 60, amount: 16 },
+    { startMinute: 7 * 60, endMinute: 8 * 60, amount: 22 },
+    { startMinute: 8 * 60, endMinute: 8 * 60 + 30, amount: 16 },
+    { startMinute: 8 * 60 + 30, endMinute: 15 * 60, amount: 9 },
+    { startMinute: 15 * 60, endMinute: 15 * 60 + 30, amount: 16 },
+    { startMinute: 15 * 60 + 30, endMinute: 17 * 60, amount: 22 },
+    { startMinute: 17 * 60, endMinute: 18 * 60, amount: 16 },
+    { startMinute: 18 * 60, endMinute: 18 * 60 + 30, amount: 9 },
   ],
 };
 
-/** Pick the right Stockholm schedule by date (high vs low season). */
-export function pickStockholmSchedule(date: Date): RateSchedule {
-  const m = date.getMonth() + 1;
-  const high = (m >= 3 && m <= 6) || (m >= 8 && m <= 11);
-  return high ? STOCKHOLM_HIGH : STOCKHOLM_LOW;
+/** Resolve gate -> tariff schedule. */
+export const SCHEDULES: Record<ScheduleKey, RateSchedule> = {
+  "stockholm-inner": STOCKHOLM_INNER_SCHEDULE,
+  "stockholm-essingeleden": STOCKHOLM_ESSINGELEDEN_SCHEDULE,
+  gothenburg: GOTHENBURG_SCHEDULE,
+};
+
+function midsummerEve(year: number): Date {
+  // Friday between June 19 and June 25 (inclusive).
+  for (let d = 19; d <= 25; d++) {
+    const dt = new Date(year, 5, d);
+    if (dt.getDay() === 5) return dt;
+  }
+  return new Date(year, 5, 19);
 }
+
+/** True if `date` falls in Stockholm's high season. Uses dynamic Midsummer Eve. */
+export function isStockholmHighSeason(date: Date): boolean {
+  const y = date.getFullYear();
+  const dayBeforeMidsummer = new Date(midsummerEve(y));
+  dayBeforeMidsummer.setDate(dayBeforeMidsummer.getDate() - 1);
+  const t = date.getTime();
+  // March 1 .. day before Midsummer Eve
+  const springStart = new Date(y, 2, 1).getTime();
+  if (t >= springStart && t <= dayBeforeMidsummer.setHours(23, 59, 59, 999)) return true;
+  // August 15 .. November 30
+  const autumnStart = new Date(y, 7, 15).getTime();
+  const autumnEnd = new Date(y, 10, 30, 23, 59, 59, 999).getTime();
+  if (t >= autumnStart && t <= autumnEnd) return true;
+  return false;
+}
+
+/** Look up the per-passage SEK amount for a tariff at a given date/time. */
+export function lookupAmount(tariff: ScheduleKey, date: Date): number {
+  const sched = SCHEDULES[tariff];
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  const range = sched.timeRanges.find(
+    (r) => minutes >= r.startMinute && minutes < r.endMinute,
+  );
+  if (!range) return 0;
+  if (sched.seasonality === "seasonal") {
+    const r = range as SeasonalTimeRange;
+    return isStockholmHighSeason(date) ? r.amountHighSeason : r.amountLowSeason;
+  }
+  return (range as FlatTimeRange).amount;
+}
+
+/** Stockholm's daily cap depends on season. Stockholm cap covers inner + Essingeleden combined. */
+export function stockholmDailyCap(date: Date): number {
+  return isStockholmHighSeason(date) ? 135 : 105;
+}
+
+export const GOTHENBURG_DAILY_CAP = 60;
+
+/** Approximate Backa-area bounding box (lat/lng). */
+export const BACKA_BBOX = {
+  minLat: 57.72,
+  maxLat: 57.77,
+  minLng: 11.93,
+  maxLng: 12.0,
+};
 
 export const ZONES: CongestionZone[] = [
   {
@@ -769,13 +830,13 @@ export const ZONES: CongestionZone[] = [
     zonePolygon: STOCKHOLM_POLY,
     controlPoints: STOCKHOLM_CPS,
     dailyCap: 135,
-    schedules: [STOCKHOLM_HIGH, STOCKHOLM_LOW],
+    schedules: [STOCKHOLM_INNER_SCHEDULE, STOCKHOLM_ESSINGELEDEN_SCHEDULE],
   },
   {
     city: "Gothenburg",
     zonePolygon: GOTHENBURG_POLY,
     controlPoints: GOTHENBURG_CPS,
-    dailyCap: 60,
+    dailyCap: GOTHENBURG_DAILY_CAP,
     schedules: [GOTHENBURG_SCHEDULE],
   },
 ];
