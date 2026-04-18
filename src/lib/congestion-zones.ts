@@ -20,26 +20,33 @@
 
 export type GeoPoint = { lat: number; lng: number };
 
-export type TimeRange = {
-  /** "HH:MM" 24h, inclusive start */
-  start: string;
-  /** "HH:MM" 24h, exclusive end */
-  end: string;
-  /** If true, only Mon–Fri (charging-day rules apply on top). */
-  weekdayOnly: boolean;
-  priceInbound: number;
-  priceOutbound: number;
+export type CongestionCity = "Stockholm" | "Gothenburg";
+
+export type ScheduleKey = "stockholm-inner" | "stockholm-essingeleden" | "gothenburg";
+
+export type SeasonalTimeRange = {
+  startMinute: number;
+  endMinute: number;
+  amountHighSeason: number;
+  amountLowSeason: number;
 };
 
+export type FlatTimeRange = {
+  startMinute: number;
+  endMinute: number;
+  amount: number;
+};
+
+export type TimeRange = SeasonalTimeRange | FlatTimeRange;
+
 export type RateSchedule = {
-  /** ISO date (YYYY-MM-DD) inclusive */
-  effectiveFrom: string;
-  /** ISO date (YYYY-MM-DD) inclusive, or null for open-ended */
-  effectiveTo: string | null;
+  key: ScheduleKey;
+  city: CongestionCity;
+  seasonality: "seasonal" | "year-round";
   timeRanges: TimeRange[];
 };
 
-export type ControlPoint = {
+type BaseControlPoint = {
   name: string;
   /** A short line segment representing the gate. Crossing this segment = a charge event. */
   gate: { a: GeoPoint; b: GeoPoint };
@@ -50,8 +57,14 @@ export type ControlPoint = {
   inboundVector: { dx: number; dy: number };
 };
 
+export type ControlPoint = BaseControlPoint & {
+  tariff: ScheduleKey;
+  /** Approximation for Gothenburg's Backa exception. */
+  backaArea?: boolean;
+};
+
 export type CongestionZone = {
-  city: "Stockholm" | "Gothenburg";
+  city: CongestionCity;
   /** Visual polygon for shading the map (informational only — NOT used for charging). */
   zonePolygon: GeoPoint[];
   controlPoints: ControlPoint[];
