@@ -1,74 +1,150 @@
 /**
- * Swedish public holidays and congestion-tax charging-day rules.
+ * Swedish congestion-tax exempt-day rules for Stockholm and Gothenburg.
  *
- * For trängselskatt, no charge is applied on:
- *  - Saturdays and Sundays
- *  - Swedish public holidays (helgdagar)
- *  - The weekday before a public holiday (dag före helgdag)
- *  - The whole month of July
- *
- * Holiday list covers 2025–2027. Update annually.
- * Sources:
+ * Source: Transportstyrelsen — last verified 2026-04-18.
  *  - https://www.transportstyrelsen.se/sv/vagtrafik/Trangselskatt/
- *  - Swedish public holiday calendar (helgdagar.se / officiella kalendrar)
+ *
+ * Rules:
+ *  - Saturdays and Sundays are exempt for both cities.
+ *  - Stockholm: July is exempt EXCEPT the first 5 weekdays (Mon–Fri) of July.
+ *  - Gothenburg: all of July is exempt.
+ *  - City-specific recurring holidays and 2026/2027 fixed dates below.
+ *  - Easter-derived dates are computed dynamically (Anonymous Gregorian algorithm).
  */
 
-/** ISO date strings (YYYY-MM-DD) for Swedish public holidays. */
-export const SWEDISH_HOLIDAYS: ReadonlySet<string> = new Set([
-  // 2025
-  "2025-01-01", // Nyårsdagen
-  "2025-01-06", // Trettondedag jul
-  "2025-04-18", // Långfredagen
-  "2025-04-20", // Påskdagen
-  "2025-04-21", // Annandag påsk
-  "2025-05-01", // Första maj
-  "2025-05-29", // Kristi himmelsfärdsdag
-  "2025-06-06", // Sveriges nationaldag
-  "2025-06-08", // Pingstdagen
-  "2025-06-21", // Midsommardagen
-  "2025-11-01", // Alla helgons dag
-  "2025-12-25", // Juldagen
-  "2025-12-26", // Annandag jul
-  // 2026
-  "2026-01-01",
-  "2026-01-06",
-  "2026-04-03", // Långfredagen
-  "2026-04-05", // Påskdagen
-  "2026-04-06", // Annandag påsk
-  "2026-05-01",
-  "2026-05-14", // Kristi himmelsfärdsdag
-  "2026-05-24", // Pingstdagen
-  "2026-06-06",
-  "2026-06-20", // Midsommardagen
-  "2026-10-31", // Alla helgons dag
-  "2026-12-25",
-  "2026-12-26",
-  // 2027
-  "2027-01-01",
-  "2027-01-06",
-  "2027-03-26", // Långfredagen
-  "2027-03-28", // Påskdagen
-  "2027-03-29", // Annandag påsk
-  "2027-05-01",
-  "2027-05-06", // Kristi himmelsfärdsdag
-  "2027-05-16", // Pingstdagen
-  "2027-06-06",
-  "2027-06-26", // Midsommardagen
-  "2027-11-06", // Alla helgons dag
-  "2027-12-25",
-  "2027-12-26",
-]);
+import type { CongestionCity } from "./congestion-zones";
 
-function toIsoDate(d: Date): string {
-  // Local-date ISO (YYYY-MM-DD), avoids UTC shifting day boundaries.
+function toIso(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
-function isHoliday(d: Date): boolean {
-  return SWEDISH_HOLIDAYS.has(toIsoDate(d));
+function addDays(d: Date, n: number): Date {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+/** Anonymous Gregorian computus for Easter Sunday. */
+function easterSunday(year: number): Date {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+
+function midsummerEve(year: number): Date {
+  for (let d = 19; d <= 25; d++) {
+    const dt = new Date(year, 5, d);
+    if (dt.getDay() === 5) return dt;
+  }
+  return new Date(year, 5, 19);
+}
+
+function allSaintsDay(year: number): Date {
+  // Saturday between Oct 31 and Nov 6.
+  for (let day = 31; day <= 31; day++) {
+    const dt = new Date(year, 9, day);
+    if (dt.getDay() === 6) return dt;
+  }
+  for (let day = 1; day <= 6; day++) {
+    const dt = new Date(year, 10, day);
+    if (dt.getDay() === 6) return dt;
+  }
+  return new Date(year, 10, 1);
+}
+
+function buildStockholmExempt(year: number): Set<string> {
+  const e = easterSunday(year);
+  const goodFriday = addDays(e, -2);
+  const easterEve = addDays(e, -1);
+  const easterMonday = addDays(e, 1);
+  const ascension = addDays(e, 39);
+  const mids = midsummerEve(year);
+  const saints = allSaintsDay(year);
+
+  const set = new Set<string>(
+    [
+      new Date(year, 0, 1), // Nyårsdagen
+      new Date(year, 0, 5), // Trettondagsafton
+      new Date(year, 0, 6), // Trettondedag jul
+      goodFriday,
+      easterEve,
+      e,
+      easterMonday,
+      new Date(year, 4, 1), // Första maj
+      ascension,
+      new Date(year, 5, 6), // Nationaldagen
+      mids,
+      saints,
+      new Date(year, 11, 24), // Julafton
+      new Date(year, 11, 25),
+      new Date(year, 11, 26),
+    ].map(toIso),
+  );
+
+  // Stockholm also exempts the day before: Good Friday, Ascension Day,
+  // All Saints' Day, May 1, National Day — only when that day-before is
+  // a weekday (Mon–Fri).
+  for (const holiday of [goodFriday, ascension, saints, new Date(year, 4, 1), new Date(year, 5, 6)]) {
+    const prev = addDays(holiday, -1);
+    const dow = prev.getDay();
+    if (dow >= 1 && dow <= 5) set.add(toIso(prev));
+  }
+  return set;
+}
+
+function buildGothenburgExempt(year: number): Set<string> {
+  const e = easterSunday(year);
+  const maundyThursday = addDays(e, -3);
+  const goodFriday = addDays(e, -2);
+  const easterEve = addDays(e, -1);
+  const easterMonday = addDays(e, 1);
+  const ascension = addDays(e, 39);
+  const dayBeforeAscension = addDays(ascension, -1);
+  const mids = midsummerEve(year);
+  const saints = allSaintsDay(year);
+  const dayBeforeSaints = addDays(saints, -1);
+  const dayBeforeNational = new Date(year, 5, 5);
+
+  return new Set<string>(
+    [
+      new Date(year, 0, 1),
+      new Date(year, 0, 5),
+      new Date(year, 0, 6),
+      maundyThursday,
+      goodFriday,
+      easterEve,
+      e,
+      easterMonday,
+      new Date(year, 3, 30), // Valborg
+      new Date(year, 4, 1),
+      dayBeforeAscension,
+      ascension,
+      dayBeforeNational,
+      new Date(year, 5, 6),
+      mids,
+      dayBeforeSaints,
+      saints,
+      new Date(year, 11, 24),
+      new Date(year, 11, 25),
+      new Date(year, 11, 26),
+      new Date(year, 11, 31),
+    ].map(toIso),
+  );
 }
 
 function isWeekend(d: Date): boolean {
@@ -76,20 +152,44 @@ function isWeekend(d: Date): boolean {
   return dow === 0 || dow === 6;
 }
 
-function isJuly(d: Date): boolean {
-  return d.getMonth() === 6; // 0-indexed: 6 = July
+/** First 5 weekdays (Mon–Fri) of July, used for Stockholm's July rule. */
+function firstFiveJulyWeekdays(year: number): string[] {
+  const out: string[] = [];
+  for (let d = 1; out.length < 5 && d <= 14; d++) {
+    const dt = new Date(year, 6, d);
+    const dow = dt.getDay();
+    if (dow >= 1 && dow <= 5) out.push(toIso(dt));
+  }
+  return out;
 }
 
 /**
- * Returns true if congestion tax applies on this date.
- * False for weekends, July, public holidays, and the weekday before a holiday.
+ * Returns true if congestion tax applies on this date for the given city.
+ * Honours weekends, July rules, and city-specific exempt dates.
  */
-export function isChargingDay(date: Date): boolean {
+export function isChargingDay(date: Date, city: CongestionCity): boolean {
   if (isWeekend(date)) return false;
-  if (isJuly(date)) return false;
-  if (isHoliday(date)) return false;
-  // Day before a public holiday (only counts when the day-before is itself a weekday).
-  const next = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-  if (isHoliday(next)) return false;
+  const iso = toIso(date);
+  const month = date.getMonth(); // 0 = Jan, 6 = July
+  if (month === 6) {
+    if (city === "Gothenburg") return false;
+    // Stockholm: only first 5 weekdays of July are charging days.
+    const allowed = firstFiveJulyWeekdays(date.getFullYear());
+    if (!allowed.includes(iso)) return false;
+  }
+  const exempt =
+    city === "Stockholm" ? buildStockholmExempt(date.getFullYear()) : buildGothenburgExempt(date.getFullYear());
+  if (exempt.has(iso)) return false;
   return true;
 }
+
+// Re-export helpers for tests.
+export const _internal = {
+  toIso,
+  easterSunday,
+  midsummerEve,
+  allSaintsDay,
+  buildStockholmExempt,
+  buildGothenburgExempt,
+  firstFiveJulyWeekdays,
+};
