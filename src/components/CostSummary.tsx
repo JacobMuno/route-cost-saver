@@ -18,7 +18,13 @@ export function CostSummary({ legs, vehicle, legCrossings }: Props) {
   const totals = tripTotals(legs, vehicle);
   const isElectric = vehicle.type === "electric";
   const allCrossings = legCrossings.flat();
-  const congestion = applyDailyCaps(allCrossings);
+  // Use the very first leg's first coordinate as the trip start, and the last
+  // leg's last coordinate as the trip end, for the Gothenburg Backa exception.
+  const firstRouteCoords = legs.find((l) => l.route)?.route?.coordinates ?? [];
+  const lastWithRoute = [...legs].reverse().find((l) => l.route)?.route?.coordinates ?? [];
+  const start = firstRouteCoords[0] ?? null;
+  const end = lastWithRoute[lastWithRoute.length - 1] ?? null;
+  const congestion = applyDailyCaps(allCrossings, { start, end });
   const grandTotal = totals.energyCost + congestion.total;
 
   return (
