@@ -28,4 +28,8 @@ export type VehicleConfig = {
   consumption: number;
   /** SEK per litre or per kWh */
   pricePerUnit: number;
+  /** Optional friendly name (e.g. "My Volvo"). */
+  name?: string;
+  /** True when consumption was filled from API Ninjas lookup. */
+  consumptionFromLookup?: boolean;
 };
