@@ -86,8 +86,9 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
         <DialogHeader>
           <DialogTitle>Find my car</DialogTitle>
           <DialogDescription>
-            Look up your car's average fuel consumption from a public US
-            database. Estimates are approximate — adjust if you know better.
+            Look up your car and get a rough fuel-consumption estimate based on
+            engine size and type. Always check it against your real-world
+            average — your owner's manual or trip computer will be more accurate.
           </DialogDescription>
         </DialogHeader>
 
@@ -186,8 +187,10 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
                     </span>
                   </div>
                   <div className="text-[11px] text-muted-foreground capitalize mt-0.5">
-                    {m.fuelType} · {m.cylinders ? `${m.cylinders}-cyl · ` : ""}
-                    {m.combinationMpg} mpg combined
+                    {m.fuelType}
+                    {m.cylinders ? ` · ${m.cylinders}-cyl` : ""}
+                    {m.displacementL ? ` · ${m.displacementL} L` : ""}
+                    {m.drive ? ` · ${m.drive}` : ""}
                   </div>
                 </button>
               );
@@ -201,7 +204,8 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
             <span className="capitalize">
               {picked.year} {picked.make} {picked.model}
             </span>{" "}
-            — {picked.consumptionLper100km} L/100 km (estimated from US database).
+            — ~{picked.consumptionLper100km} L/100 km (rough estimate from
+            engine size; please verify against your real-world average).
           </div>
         )}
 
