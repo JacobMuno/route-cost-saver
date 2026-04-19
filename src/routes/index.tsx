@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Fuel, AlertTriangle } from "lucide-react";
 import { LegsEditor } from "@/components/LegsEditor";
 import { TripMap } from "@/components/TripMap";
-import { VehiclePanel } from "@/components/VehiclePanel";
+import { CarComparePanel } from "@/components/CarComparePanel";
 import { CostSummary } from "@/components/CostSummary";
 import { DepartureTimePicker } from "@/components/DepartureTimePicker";
-import { useVehicleByType } from "@/hooks/useVehicleByType";
+import { useCompareVehicles } from "@/hooks/useCompareVehicles";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { getDirections } from "@/server/ors";
 import { detectCrossings } from "@/lib/congestion";
@@ -34,7 +34,8 @@ function makeLeg(): Leg {
 
 function Index() {
   const [legs, setLegs] = useState<Leg[]>(() => [makeLeg()]);
-  const [vehicle, setVehicle] = useVehicleByType();
+  const { carA, carB, setCarA, setCarB, compareEnabled, setCompareEnabled } =
+    useCompareVehicles();
 
   // Departure mode persists, but the chosen custom time does NOT survive a
   // fresh app open — we always default back to "now" on load to avoid
@@ -190,14 +191,26 @@ function Index() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-border bg-card p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
-                Your vehicle
+            <section>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                Your vehicle{compareEnabled ? "s" : ""}
               </h2>
-              <VehiclePanel vehicle={vehicle} onChange={setVehicle} />
+              <CarComparePanel
+                carA={carA}
+                setCarA={setCarA}
+                carB={carB}
+                setCarB={setCarB}
+                compareEnabled={compareEnabled}
+                setCompareEnabled={setCompareEnabled}
+              />
             </section>
 
-            <CostSummary legs={legs} vehicle={vehicle} legCrossings={legCrossings} />
+            <CostSummary
+              legs={legs}
+              vehicle={carA}
+              vehicleB={compareEnabled ? carB : null}
+              legCrossings={legCrossings}
+            />
           </div>
         </div>
       </main>
