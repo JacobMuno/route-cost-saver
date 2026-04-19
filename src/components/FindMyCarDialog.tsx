@@ -186,8 +186,10 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
                     </span>
                   </div>
                   <div className="text-[11px] text-muted-foreground capitalize mt-0.5">
-                    {m.fuelType} · {m.cylinders ? `${m.cylinders}-cyl · ` : ""}
-                    {m.combinationMpg} mpg combined
+                    {m.fuelType}
+                    {m.cylinders ? ` · ${m.cylinders}-cyl` : ""}
+                    {m.displacementL ? ` · ${m.displacementL} L` : ""}
+                    {m.drive ? ` · ${m.drive}` : ""}
                   </div>
                 </button>
               );
@@ -201,7 +203,8 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
             <span className="capitalize">
               {picked.year} {picked.make} {picked.model}
             </span>{" "}
-            — {picked.consumptionLper100km} L/100 km (estimated from US database).
+            — ~{picked.consumptionLper100km} L/100 km (rough estimate from
+            engine size; please verify against your real-world average).
           </div>
         )}
 
