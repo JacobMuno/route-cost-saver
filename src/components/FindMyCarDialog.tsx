@@ -86,8 +86,9 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
         <DialogHeader>
           <DialogTitle>Find my car</DialogTitle>
           <DialogDescription>
-            Look up your car's average fuel consumption from a public US
-            database. Estimates are approximate — adjust if you know better.
+            Look up your car and get a rough fuel-consumption estimate based on
+            engine size and type. Always check it against your real-world
+            average — your owner's manual or trip computer will be more accurate.
           </DialogDescription>
         </DialogHeader>
 
