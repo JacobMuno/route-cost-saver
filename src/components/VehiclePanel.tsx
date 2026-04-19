@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Fuel, Plug, Zap, Leaf } from "lucide-react";
+import { Fuel, Plug, Zap, Leaf, Search, X } from "lucide-react";
 import type { VehicleConfig, VehicleType } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { FindMyCarDialog } from "./FindMyCarDialog";
 
 function NumberField({
   value,
@@ -53,6 +54,7 @@ type Props = {
 };
 
 export function VehiclePanel({ vehicle, onChange }: Props) {
+  const [lookupOpen, setLookupOpen] = useState(false);
   const isElectric = vehicle.type === "electric";
   const isHybrid = vehicle.type === "hybrid";
   const consumptionUnit = isElectric ? "kWh / 100 km" : "L / 100 km";
@@ -68,6 +70,19 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
 
   return (
     <div className="space-y-4">
+      <div>
+        <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+          Car name (optional)
+        </label>
+        <input
+          type="text"
+          value={vehicle.name ?? ""}
+          onChange={(e) => onChange({ ...vehicle, name: e.target.value })}
+          placeholder="My car"
+          className="mt-2 w-full rounded-xl border border-border bg-input px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+        />
+      </div>
+
       <div>
         <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
           Vehicle type
@@ -107,10 +122,35 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
           <div className="mt-2">
             <NumberField
               value={vehicle.consumption}
-              onChange={(n) => onChange({ ...vehicle, consumption: n })}
+              onChange={(n) =>
+                onChange({ ...vehicle, consumption: n, consumptionFromLookup: false })
+              }
               placeholder={consumptionPlaceholder}
             />
           </div>
+          {!isElectric && (
+            <button
+              type="button"
+              onClick={() => setLookupOpen(true)}
+              className="mt-1.5 inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+            >
+              <Search className="h-3 w-3" />
+              Find my car
+            </button>
+          )}
+          {vehicle.consumptionFromLookup && (
+            <div className="mt-1.5 flex items-start justify-between gap-2 rounded-lg bg-primary/5 px-2 py-1 text-[11px] text-muted-foreground">
+              <span>Filled from lookup — adjust if you know better.</span>
+              <button
+                type="button"
+                onClick={() => onChange({ ...vehicle, consumptionFromLookup: false })}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Dismiss"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
         </div>
 
         <div>
@@ -134,6 +174,19 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
         <Plug className="h-3 w-3 mt-0.5 shrink-0" />
         {helperText}
       </p>
+
+      <FindMyCarDialog
+        open={lookupOpen}
+        onOpenChange={setLookupOpen}
+        onConfirm={(consumption, label) => {
+          onChange({
+            ...vehicle,
+            consumption,
+            consumptionFromLookup: true,
+            name: vehicle.name && vehicle.name.trim() ? vehicle.name : label,
+          });
+        }}
+      />
     </div>
   );
 }
