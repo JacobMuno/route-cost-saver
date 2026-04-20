@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Loader2, Search, AlertCircle, Check } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, Search, AlertCircle, Check, Zap } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,45 +9,79 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { lookupCar, type CarMatch } from "@/server/carLookup";
+import { searchEvCatalog, type EvSpec } from "@/lib/evCatalog";
 import { cn } from "@/lib/utils";
 
 type Props = {
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  /** Called with the chosen consumption (L/100km) when user confirms. */
-  onConfirm: (consumptionLper100km: number, label: string) => void;
+  /** Whether the active vehicle is electric — switches to EV catalog mode. */
+  isElectric?: boolean;
+  /**
+   * Called with the chosen consumption when user confirms.
+   * Units: L/100km for ICE, kWh/100km for electric.
+   */
+  onConfirm: (consumption: number, label: string) => void;
 };
 
-export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
+type EvMatch = EvSpec; // alias for clarity
+
+export function FindMyCarDialog({ open, onOpenChange, isElectric, onConfirm }: Props) {
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [matches, setMatches] = useState<CarMatch[]>([]);
+  const [evMatches, setEvMatches] = useState<EvMatch[]>([]);
   const [searched, setSearched] = useState(false);
   const [pickedIdx, setPickedIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (!open) {
-      // Reset on close so the next open is fresh.
       setError(null);
       setMatches([]);
+      setEvMatches([]);
       setSearched(false);
       setPickedIdx(null);
     }
   }, [open]);
 
+  // Reset results when switching modes (electric vs ICE).
+  useEffect(() => {
+    setMatches([]);
+    setEvMatches([]);
+    setSearched(false);
+    setPickedIdx(null);
+    setError(null);
+  }, [isElectric]);
+
   const canSearch = make.trim().length > 0 && model.trim().length > 0 && !loading;
 
   const onSearch = async () => {
     if (!canSearch) return;
-    setLoading(true);
     setError(null);
     setMatches([]);
+    setEvMatches([]);
     setPickedIdx(null);
+
+    const yr = year.trim() ? parseInt(year, 10) : undefined;
+
+    if (isElectric) {
+      // Local catalog lookup — instant, no network.
+      const res = searchEvCatalog({
+        make: make.trim(),
+        model: model.trim(),
+        year: Number.isFinite(yr) ? (yr as number) : undefined,
+      });
+      setEvMatches(res);
+      if (res.length > 0) setPickedIdx(0);
+      setSearched(true);
+      return;
+    }
+
+    setLoading(true);
     try {
-      const yr = year.trim() ? parseInt(year, 10) : undefined;
       const res = await lookupCar({
         data: {
           make: make.trim(),
@@ -58,7 +92,6 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
       if (res.error) {
         setError(res.error);
       } else {
-        // Only show matches that have a usable consumption value.
         const usable = res.matches.filter((m) => m.consumptionLper100km !== null);
         setMatches(usable);
         if (usable.length > 0) setPickedIdx(0);
@@ -71,24 +104,52 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
     }
   };
 
-  const picked = pickedIdx !== null ? matches[pickedIdx] : null;
+  const pickedEv = isElectric && pickedIdx !== null ? evMatches[pickedIdx] : null;
+  const pickedIce = !isElectric && pickedIdx !== null ? matches[pickedIdx] : null;
+
+  const pickedDisplayYear = useMemo(() => {
+    if (pickedEv) {
+      const y = year.trim() ? parseInt(year, 10) : undefined;
+      return y && y >= pickedEv.yearFrom ? y : pickedEv.yearFrom;
+    }
+    return null;
+  }, [pickedEv, year]);
 
   const onUse = () => {
-    if (!picked || picked.consumptionLper100km === null) return;
-    const label = `${picked.year} ${picked.make} ${picked.model}`;
-    onConfirm(picked.consumptionLper100km, label);
-    onOpenChange(false);
+    if (pickedEv) {
+      const label = `${pickedDisplayYear ?? pickedEv.yearFrom} ${pickedEv.make} ${pickedEv.model}${
+        pickedEv.variant ? ` ${pickedEv.variant}` : ""
+      }`;
+      onConfirm(pickedEv.kwhPer100km, label);
+      onOpenChange(false);
+      return;
+    }
+    if (pickedIce && pickedIce.consumptionLper100km !== null) {
+      const label = `${pickedIce.year} ${pickedIce.make} ${pickedIce.model}`;
+      onConfirm(pickedIce.consumptionLper100km, label);
+      onOpenChange(false);
+    }
   };
+
+  const hasPicked = pickedEv !== null || pickedIce !== null;
+  const noResults =
+    searched &&
+    !loading &&
+    !error &&
+    (isElectric ? evMatches.length === 0 : matches.length === 0);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Find my car</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {isElectric && <Zap className="h-4 w-4 text-primary" />}
+            Find my car
+          </DialogTitle>
           <DialogDescription>
-            Look up your car and get a rough fuel-consumption estimate based on
-            engine size and type. Always check it against your real-world
-            average — your owner's manual or trip computer will be more accurate.
+            {isElectric
+              ? "Pick from our built-in catalog of common EVs (kWh/100 km, WLTP combined). Real-world consumption depends on speed, weather, and driving style — adjust if you know better."
+              : "Look up your car and get a rough fuel-consumption estimate based on engine size and type. Always check it against your real-world average — your owner's manual or trip computer will be more accurate."}
           </DialogDescription>
         </DialogHeader>
 
@@ -101,7 +162,7 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
               type="text"
               value={make}
               onChange={(e) => setMake(e.target.value)}
-              placeholder="Volvo"
+              placeholder={isElectric ? "Tesla" : "Volvo"}
               className="mt-1 w-full rounded-xl border border-border bg-input px-3 py-2 text-sm outline-none focus:border-primary"
               onKeyDown={(e) => e.key === "Enter" && onSearch()}
             />
@@ -114,7 +175,7 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
               type="text"
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              placeholder="XC60"
+              placeholder={isElectric ? "Model 3" : "XC60"}
               className="mt-1 w-full rounded-xl border border-border bg-input px-3 py-2 text-sm outline-none focus:border-primary"
               onKeyDown={(e) => e.key === "Enter" && onSearch()}
             />
@@ -152,14 +213,52 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
           </div>
         )}
 
-        {searched && !loading && matches.length === 0 && !error && (
+        {noResults && (
           <p className="text-xs text-muted-foreground">
-            No fuel-consumption data found. Try a different spelling, drop the
-            year, or enter consumption manually.
+            {isElectric
+              ? "No match in the EV catalog. Try a different spelling (e.g. 'VW' → 'Volkswagen', 'Mercedes' → 'Mercedes-Benz') or enter kWh/100 km manually."
+              : "No fuel-consumption data found. Try a different spelling, drop the year, or enter consumption manually."}
           </p>
         )}
 
-        {matches.length > 0 && (
+        {isElectric && evMatches.length > 0 && (
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+              {evMatches.length} match{evMatches.length === 1 ? "" : "es"}
+            </p>
+            {evMatches.map((m, i) => {
+              const active = i === pickedIdx;
+              return (
+                <button
+                  key={`${m.make}-${m.model}-${m.variant ?? ""}-${i}`}
+                  type="button"
+                  onClick={() => setPickedIdx(i)}
+                  className={cn(
+                    "w-full text-left rounded-xl border px-3 py-2 transition-all",
+                    active
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-input hover:border-primary/50",
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium">
+                      {m.make} {m.model}
+                      {m.variant ? ` · ${m.variant}` : ""}
+                    </span>
+                    <span className="text-sm font-semibold tabular-nums">
+                      {m.kwhPer100km} kWh/100km
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">
+                    From {m.yearFrom} · WLTP combined estimate
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {!isElectric && matches.length > 0 && (
           <div className="space-y-2 max-h-60 overflow-y-auto">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
               {matches.length} match{matches.length === 1 ? "" : "es"}
@@ -198,13 +297,23 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
           </div>
         )}
 
-        {picked && (
+        {pickedEv && (
+          <div className="rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-xs">
+            <span className="font-medium">Selected:</span>{" "}
+            {pickedDisplayYear} {pickedEv.make} {pickedEv.model}
+            {pickedEv.variant ? ` ${pickedEv.variant}` : ""} —{" "}
+            {pickedEv.kwhPer100km} kWh/100 km (WLTP combined; real-world use
+            varies with speed, weather, and driving style).
+          </div>
+        )}
+
+        {pickedIce && (
           <div className="rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-xs">
             <span className="font-medium">Selected:</span>{" "}
             <span className="capitalize">
-              {picked.year} {picked.make} {picked.model}
+              {pickedIce.year} {pickedIce.make} {pickedIce.model}
             </span>{" "}
-            — ~{picked.consumptionLper100km} L/100 km (rough estimate from
+            — ~{pickedIce.consumptionLper100km} L/100 km (rough estimate from
             engine size; please verify against your real-world average).
           </div>
         )}
@@ -220,7 +329,7 @@ export function FindMyCarDialog({ open, onOpenChange, onConfirm }: Props) {
           <button
             type="button"
             onClick={onUse}
-            disabled={!picked}
+            disabled={!hasPicked}
             className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-medium disabled:opacity-50 flex items-center gap-1.5"
           >
             <Check className="h-4 w-4" />
