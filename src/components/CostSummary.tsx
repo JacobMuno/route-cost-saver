@@ -241,7 +241,7 @@ export function CostSummary({ legs, vehicle, vehicleB, legCrossings }: Props) {
                         >
                           <span className="flex items-center gap-1.5">
                             <Receipt className="h-3 w-3" />
-                            {c.city} · {c.controlPoint} · {c.direction} ·{" "}
+                            {c.city} · {c.station} · {c.direction} ·{" "}
                             {formatTime(c.time)}
                           </span>
                           <span className="tabular-nums">{formatSEK(c.charge)}</span>

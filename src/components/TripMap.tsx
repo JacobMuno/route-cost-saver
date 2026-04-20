@@ -44,19 +44,19 @@ export function TripMap({ legs, legCrossings }: Props) {
       maxZoom: 19,
     }).addTo(map);
 
-    // Static congestion zone overlays — informational only.
-    const zoneColor = resolveColor("oklch(0.78 0.16 60)");
+    // Static congestion control point markers — informational only.
+    const cpColor = resolveColor("oklch(0.78 0.16 60)");
     ZONES.forEach((zone) => {
-      const latlngs = zone.zonePolygon.map(
-        (p) => [p.lat, p.lng] as L.LatLngExpression,
-      );
-      L.polygon(latlngs, {
-        color: zoneColor,
-        weight: 1,
-        fillColor: zoneColor,
-        fillOpacity: 0.08,
-        interactive: false,
-      }).addTo(map);
+      zone.controlPoints.forEach((cp) => {
+        L.circleMarker([cp.point.lat, cp.point.lng], {
+          radius: 3,
+          color: cpColor,
+          weight: 1,
+          fillColor: cpColor,
+          fillOpacity: 0.5,
+          interactive: false,
+        }).addTo(map);
+      });
     });
 
     layerRef.current = L.layerGroup().addTo(map);
@@ -114,7 +114,7 @@ export function TripMap({ legs, legCrossings }: Props) {
         })
           .addTo(layer)
           .bindPopup(
-            `<strong>${c.city}</strong><br/>${c.controlPoint}<br/>${c.direction} · ${c.time.toLocaleTimeString(
+            `<strong>${c.city}</strong><br/>${c.station}<br/>${c.direction} · ${c.time.toLocaleTimeString(
               "sv-SE",
               { hour: "2-digit", minute: "2-digit" },
             )}<br/><strong>${formatSEK(c.charge)}</strong>`,
