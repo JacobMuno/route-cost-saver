@@ -128,16 +128,14 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
               placeholder={consumptionPlaceholder}
             />
           </div>
-          {!isElectric && (
-            <button
-              type="button"
-              onClick={() => setLookupOpen(true)}
-              className="mt-1.5 inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
-            >
-              <Search className="h-3 w-3" />
-              Find my car
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setLookupOpen(true)}
+            className="mt-1.5 inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+          >
+            <Search className="h-3 w-3" />
+            Find my car
+          </button>
           {vehicle.consumptionFromLookup && (
             <div className="mt-1.5 flex items-start justify-between gap-2 rounded-lg bg-primary/5 px-2 py-1 text-[11px] text-muted-foreground">
               <span>Filled from lookup — adjust if you know better.</span>
@@ -178,6 +176,7 @@ export function VehiclePanel({ vehicle, onChange }: Props) {
       <FindMyCarDialog
         open={lookupOpen}
         onOpenChange={setLookupOpen}
+        isElectric={isElectric}
         onConfirm={(consumption, label) => {
           onChange({
             ...vehicle,
