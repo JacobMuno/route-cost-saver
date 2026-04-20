@@ -13,9 +13,10 @@ import { isChargingDay } from "../swedishHolidays";
 function mkCrossing(partial: Partial<Crossing>): Crossing {
   return {
     city: "Stockholm",
-    controlPoint: "Test",
+    station: "Test",
+    cpId: 0,
     tariff: "stockholm-inner",
-    direction: "inbound",
+    direction: "north",
     time: new Date(2026, 3, 14, 7, 15),
     charge: 0,
     point: { lat: 0, lng: 0 },
@@ -71,32 +72,32 @@ describe("Gothenburg rate lookup", () => {
 describe("Combining rules", () => {
   it("Gothenburg multi-passage 16+22 within 60 min → 22 total", () => {
     const xs: Crossing[] = [
-      mkCrossing({ city: "Gothenburg", tariff: "gothenburg", controlPoint: "A",
+      mkCrossing({ city: "Gothenburg", tariff: "gothenburg", station: "A",
         time: new Date(2026, 3, 14, 15, 10), charge: 16 }),
-      mkCrossing({ city: "Gothenburg", tariff: "gothenburg", controlPoint: "B",
+      mkCrossing({ city: "Gothenburg", tariff: "gothenburg", station: "B",
         time: new Date(2026, 3, 14, 15, 40), charge: 22 }),
     ];
     expect(applyDailyCaps(xs).totalsByCity.Gothenburg).toBe(22);
   });
   it("Stockholm cap (high) 6×45 → 135", () => {
     const xs = Array.from({ length: 6 }, (_, i) =>
-      mkCrossing({ controlPoint: `I${i}`, time: new Date(2026, 3, 14, 7, 15 + i), charge: 45 }));
+      mkCrossing({ station: `I${i}`, time: new Date(2026, 3, 14, 7, 15 + i), charge: 45 }));
     expect(stockholmDailyCap(xs[0].time)).toBe(135);
     expect(applyDailyCaps(xs).totalsByCity.Stockholm).toBe(135);
   });
   it("Stockholm cap (low) 6×35 → 105", () => {
     const xs = Array.from({ length: 6 }, (_, i) =>
-      mkCrossing({ controlPoint: `I${i}`, time: new Date(2026, 0, 13, 7, 15 + i), charge: 35 }));
+      mkCrossing({ station: `I${i}`, time: new Date(2026, 0, 13, 7, 15 + i), charge: 35 }));
     expect(stockholmDailyCap(xs[0].time)).toBe(105);
     expect(applyDailyCaps(xs).totalsByCity.Stockholm).toBe(105);
   });
-  it("Essingeleden Fredhäll + Kristineberg inbound → one charge", () => {
+  it("Essingeleden Fredhäll + Kristineberg same direction → one charge", () => {
     const t = new Date(2026, 3, 14, 7, 15);
     const xs: Crossing[] = [
-      mkCrossing({ controlPoint: "Tpl Fredhäll/Drottningsholmsvägen",
-        tariff: "stockholm-essingeleden", time: t, charge: 40 }),
-      mkCrossing({ controlPoint: "Tpl Kristineberg",
-        tariff: "stockholm-essingeleden", time: new Date(t.getTime() + 60_000), charge: 40 }),
+      mkCrossing({ station: "Tpl Fredhäll/Drottningsholmsvägen",
+        tariff: "stockholm-essingeleden", direction: "north", time: t, charge: 40 }),
+      mkCrossing({ station: "Tpl Kristineberg",
+        tariff: "stockholm-essingeleden", direction: "north", time: new Date(t.getTime() + 60_000), charge: 40 }),
     ];
     expect(applyDailyCaps(xs).totalsByCity.Stockholm).toBe(40);
   });
