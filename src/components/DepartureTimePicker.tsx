@@ -33,10 +33,10 @@ export function DepartureTimePicker({ mode, customTime, onChange }: Props) {
   }, [mode, customTime]);
 
   return (
-    <div className="rounded-2xl border border-border bg-card/40 p-3 space-y-2">
-      <div className="flex items-center gap-2">
+    <div className="rounded-2xl border border-border bg-surface p-3.5 space-y-2.5">
+      <div className="flex items-center gap-1.5">
         <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <span className="text-[10px] uppercase tracking-[0.16em] font-semibold text-muted-foreground">
           Departure
         </span>
       </div>
@@ -47,8 +47,8 @@ export function DepartureTimePicker({ mode, customTime, onChange }: Props) {
           className={cn(
             "flex items-center justify-center gap-1.5 rounded-xl border px-2 py-2 text-xs font-medium transition-all",
             mode === "now"
-              ? "border-primary bg-primary/10 text-foreground"
-              : "border-border bg-input text-muted-foreground hover:text-foreground",
+              ? "border-primary bg-primary/10 text-primary shadow-card"
+              : "border-border bg-input text-muted-foreground hover:text-foreground hover:border-primary/30",
           )}
         >
           <Clock className="h-3.5 w-3.5" />
@@ -63,8 +63,8 @@ export function DepartureTimePicker({ mode, customTime, onChange }: Props) {
           className={cn(
             "flex items-center justify-center gap-1.5 rounded-xl border px-2 py-2 text-xs font-medium transition-all",
             mode === "custom"
-              ? "border-primary bg-primary/10 text-foreground"
-              : "border-border bg-input text-muted-foreground hover:text-foreground",
+              ? "border-primary bg-primary/10 text-primary shadow-card"
+              : "border-border bg-input text-muted-foreground hover:text-foreground hover:border-primary/30",
           )}
         >
           <CalendarIcon className="h-3.5 w-3.5" />
@@ -80,7 +80,7 @@ export function DepartureTimePicker({ mode, customTime, onChange }: Props) {
             const d = fromLocalInputValue(e.target.value);
             if (d) onChange("custom", d);
           }}
-          className="w-full rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
         />
       )}
     </div>

@@ -12,7 +12,13 @@ type Props = {
   iconColor?: string;
 };
 
-export function AddressInput({ value, onChange, placeholder, onRemove, iconColor }: Props) {
+export function AddressInput({
+  value,
+  onChange,
+  placeholder,
+  onRemove,
+  iconColor,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<
@@ -81,26 +87,27 @@ export function AddressInput({ value, onChange, placeholder, onRemove, iconColor
           <button
             type="button"
             onClick={onRemove}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
             aria-label="Remove"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
       {open && suggestions.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-xl border border-border bg-popover shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-border bg-popover shadow-elevated overflow-hidden">
           {suggestions.map((s, i) => (
             <button
               key={i}
               type="button"
               onClick={() => pick(s)}
               className={cn(
-                "w-full text-left px-3 py-2 text-sm text-popover-foreground hover:bg-accent/20 transition-colors",
-                i > 0 && "border-t border-border",
+                "w-full text-left px-3 py-2.5 text-sm text-popover-foreground hover:bg-muted transition-colors flex items-start gap-2",
+                i > 0 && "border-t border-border/60",
               )}
             >
-              {s.label}
+              <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
+              <span className="min-w-0">{s.label}</span>
             </button>
           ))}
         </div>

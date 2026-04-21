@@ -1,13 +1,13 @@
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, MapPin } from "lucide-react";
 import { AddressInput } from "./AddressInput";
 import type { Leg } from "@/lib/types";
 import { formatDuration } from "@/lib/cost";
 
 const ROUTE_COLORS = [
-  "oklch(0.78 0.18 145)",
-  "oklch(0.72 0.18 220)",
-  "oklch(0.78 0.16 60)",
-  "oklch(0.7 0.2 320)",
+  "var(--route-1)",
+  "var(--route-2)",
+  "var(--route-3)",
+  "var(--route-4)",
 ];
 
 type Props = {
@@ -19,38 +19,42 @@ type Props = {
 
 export function LegsEditor({ legs, onUpdateLeg, onAddLeg, onRemoveLeg }: Props) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {legs.map((leg, idx) => {
         const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
         return (
-          <div key={leg.id} className="rounded-2xl border border-border bg-card/40 p-3 space-y-2">
+          <div
+            key={leg.id}
+            className="rounded-2xl border border-border bg-surface p-3.5 space-y-2.5"
+          >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <span
-                  className="h-2.5 w-2.5 rounded-full"
+                  className="h-2.5 w-2.5 rounded-full ring-2 ring-background shrink-0"
                   style={{ backgroundColor: color }}
                 />
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="text-[10px] uppercase tracking-[0.16em] font-semibold text-muted-foreground">
                   Leg {idx + 1}
                 </span>
                 {leg.status === "loading" && (
-                  <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-3 w-3 animate-spin text-primary" />
                 )}
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 shrink-0">
                 {leg.route && (
-                  <span className="text-xs text-muted-foreground">
-                    {leg.route.distanceKm.toFixed(1)} km · {formatDuration(leg.route.durationMin)}
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {leg.route.distanceKm.toFixed(1)} km ·{" "}
+                    {formatDuration(leg.route.durationMin)}
                   </span>
                 )}
                 {legs.length > 1 && (
                   <button
                     type="button"
                     onClick={() => onRemoveLeg(leg.id)}
-                    className="text-muted-foreground hover:text-destructive transition-colors"
+                    className="grid h-7 w-7 place-items-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                     aria-label="Remove leg"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 )}
               </div>
@@ -97,13 +101,15 @@ export function LegsEditor({ legs, onUpdateLeg, onAddLeg, onRemoveLeg }: Props) 
                   waypoints: [...l.waypoints, { query: "", point: null, label: null }],
                 }))
               }
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+              className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
             >
-              <Plus className="h-3 w-3" /> Add waypoint
+              <MapPin className="h-3 w-3" /> Add waypoint
             </button>
 
             {leg.error && (
-              <p className="text-xs text-destructive">{leg.error}</p>
+              <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-2.5 py-1.5 text-xs text-destructive">
+                {leg.error}
+              </p>
             )}
           </div>
         );
@@ -112,7 +118,7 @@ export function LegsEditor({ legs, onUpdateLeg, onAddLeg, onRemoveLeg }: Props) 
       <button
         type="button"
         onClick={onAddLeg}
-        className="w-full rounded-2xl border border-dashed border-border bg-card/20 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors flex items-center justify-center gap-2"
+        className="w-full rounded-2xl border border-dashed border-border bg-muted/20 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
       >
         <Plus className="h-4 w-4" /> Add another leg
       </button>
