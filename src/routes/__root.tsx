@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import appCss from "../styles.css?url";
 import { PwaInstall } from "@/components/PwaInstall";
 import { registerServiceWorker } from "@/lib/registerSW";
+import { ThemeProvider, themeBootstrapScript } from "@/lib/theme";
+import { SettingsProvider } from "@/lib/settings";
+import { AppHeader } from "@/components/AppHeader";
 
 function NotFoundComponent() {
   return (
@@ -17,7 +20,7 @@ function NotFoundComponent() {
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-glow"
           >
             Go home
           </Link>
@@ -32,18 +35,18 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Trip Cost Calculator – Fuel & Charging in Sweden" },
+      { title: "TripCost — Fuel & Charging Cost Calculator for Sweden" },
       {
         name: "description",
         content:
-          "Calculate the real cost of your trip in Sweden. Petrol, diesel, or electric — get an instant SEK estimate from your route.",
+          "Plan smarter trips. Instant SEK estimates for fuel, charging and Swedish congestion tax — petrol, diesel, hybrid or electric.",
       },
-      { name: "theme-color", content: "#0b1220" },
+      { name: "theme-color", content: "#0d1220" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "TripCost" },
-      { property: "og:title", content: "Trip Cost Calculator" },
-      { property: "og:description", content: "Fuel & charging cost calculator for Sweden." },
+      { property: "og:title", content: "TripCost — Trip Cost Calculator for Sweden" },
+      { property: "og:description", content: "Fuel, charging & congestion tax in one estimate." },
       { property: "og:type", content: "website" },
     ],
     links: [
@@ -60,11 +63,13 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        {/* Apply theme before paint to avoid flash */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
-      <body>
+      <body className="min-h-screen bg-background text-foreground antialiased">
         {children}
         <Scripts />
       </body>
@@ -77,9 +82,26 @@ function RootComponent() {
     registerServiceWorker();
   }, []);
   return (
-    <>
-      <Outlet />
-      <PwaInstall />
-    </>
+    <ThemeProvider>
+      <SettingsProvider>
+        <div className="min-h-screen flex flex-col bg-background">
+          <AppHeader />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          <footer className="border-t border-border/70 bg-background/60">
+            <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+              <p>© {new Date().getFullYear()} TripCost. Estimates only — verify with your provider.</p>
+              <p className="flex items-center gap-3">
+                <span>Routing by OpenRouteService</span>
+                <span>·</span>
+                <span>Map © OpenStreetMap</span>
+              </p>
+            </div>
+          </footer>
+          <PwaInstall />
+        </div>
+      </SettingsProvider>
+    </ThemeProvider>
   );
 }
