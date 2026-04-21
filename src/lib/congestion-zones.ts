@@ -82,6 +82,217 @@ export type CongestionZone = {
 };
 
 // =============================================================================
+// Congestion zone polygons
+// =============================================================================
+//
+// These are the geographic areas whose boundary crossings trigger congestion
+// tax. Source: OpenStreetMap administrative boundaries (admin_level=9
+// stadsdelsområden), unioned and then with Essingeleden subtracted out.
+//
+//   Stockholm inner city = Kungsholmens + Södermalms + Norra innerstadens
+//                          stadsdelsområden MINUS Stora/Lilla Essingen
+//   Stockholm Essingeleden = Stora Essingen + Lilla Essingen (admin_level=10)
+//
+// Caveat: OSM's stadsdelsgräns is NOT identical to Transportstyrelsen's
+// charging cordon. Some betalstationer sit ~500m-1.5km inside or outside the
+// stadsdelsgräns (e.g. Tpl Ekhagen, Värtan, Ropsten — highway interchanges
+// well outside the residential district boundary). For crossing DETECTION
+// that's fine: a route heading inbound still crosses the polygon once, just
+// at a slightly different location than the camera itself. For crossing
+// TARIFF-ASSIGNMENT we fall back to the nearest Lastkajen control point.
+//
+// If higher precision is needed, replace these rings with a hand-traced
+// polygon following the exact charging cordon. For the Råcksta → Götgatan
+// use case this approximation is sufficient.
+
+export type Polygon = {
+  /** Outer ring, WGS84 (lat/lng). Counter-clockwise or clockwise either works. */
+  outer: GeoPoint[];
+  /** Holes (e.g. islands within the polygon that aren't part of the zone). */
+  holes: GeoPoint[][];
+};
+
+/** Stockholm innerstad — stadsdelsområdena Kungsholmen + Södermalm + Norra innerstaden, med Essingeleden-öarna utklippta. */
+export const STOCKHOLM_INNER_POLYGON: Polygon = {
+  outer: [
+    { lat: 59.315107, lng: 18.108591 },
+    { lat: 59.315022, lng: 18.108105 },
+    { lat: 59.315149, lng: 18.107847 },
+    { lat: 59.313720, lng: 18.105402 },
+    { lat: 59.312617, lng: 18.107753 },
+    { lat: 59.312381, lng: 18.107588 },
+    { lat: 59.312075, lng: 18.107700 },
+    { lat: 59.311445, lng: 18.108684 },
+    { lat: 59.311347, lng: 18.109486 },
+    { lat: 59.309019, lng: 18.113014 },
+    { lat: 59.309002, lng: 18.112949 },
+    { lat: 59.308917, lng: 18.113090 },
+    { lat: 59.308932, lng: 18.112667 },
+    { lat: 59.308565, lng: 18.112591 },
+    { lat: 59.306549, lng: 18.112981 },
+    { lat: 59.306059, lng: 18.112971 },
+    { lat: 59.306036, lng: 18.113240 },
+    { lat: 59.305269, lng: 18.113354 },
+    { lat: 59.304789, lng: 18.113582 },
+    { lat: 59.304417, lng: 18.114186 },
+    { lat: 59.304288, lng: 18.114279 },
+    { lat: 59.303939, lng: 18.114066 },
+    { lat: 59.302903, lng: 18.112130 },
+    { lat: 59.302387, lng: 18.111974 },
+    { lat: 59.301962, lng: 18.110609 },
+    { lat: 59.301822, lng: 18.110973 },
+    { lat: 59.301781, lng: 18.111791 },
+    { lat: 59.301698, lng: 18.111211 },
+    { lat: 59.301186, lng: 18.111044 },
+    { lat: 59.300862, lng: 18.108528 },
+    { lat: 59.300582, lng: 18.102813 },
+    { lat: 59.300753, lng: 18.100894 },
+    { lat: 59.300599, lng: 18.091773 },
+    { lat: 59.300549, lng: 18.091138 },
+    { lat: 59.300408, lng: 18.090941 },
+    { lat: 59.300301, lng: 18.090280 },
+    { lat: 59.300361, lng: 18.089844 },
+    { lat: 59.300238, lng: 18.088666 },
+    { lat: 59.299441, lng: 18.085851 },
+    { lat: 59.300182, lng: 18.084967 },
+    { lat: 59.301080, lng: 18.082690 },
+    { lat: 59.301678, lng: 18.080820 },
+    { lat: 59.302038, lng: 18.080327 },
+    { lat: 59.303450, lng: 18.079493 },
+    { lat: 59.302905, lng: 18.075920 },
+    { lat: 59.302730, lng: 18.073446 },
+    { lat: 59.302807, lng: 18.070973 },
+    { lat: 59.303391, lng: 18.066128 },
+    { lat: 59.305465, lng: 18.053974 },
+    { lat: 59.304721, lng: 18.046007 },
+    { lat: 59.307028, lng: 18.038682 },
+    { lat: 59.310882, lng: 18.037552 },
+    { lat: 59.311273, lng: 18.037046 },
+    { lat: 59.314269, lng: 18.030278 },
+    { lat: 59.315928, lng: 18.024805 },
+    { lat: 59.316466, lng: 18.018188 },
+    { lat: 59.317737, lng: 18.014747 },
+    { lat: 59.322122, lng: 18.011419 },
+    { lat: 59.323051, lng: 18.015785 },
+    { lat: 59.323756, lng: 18.014844 },
+    { lat: 59.327035, lng: 18.006100 },
+    { lat: 59.327949, lng: 18.001357 },
+    { lat: 59.327537, lng: 17.997050 },
+    { lat: 59.329644, lng: 17.991126 },
+    { lat: 59.332873, lng: 17.994024 },
+    { lat: 59.334714, lng: 17.994532 },
+    { lat: 59.336200, lng: 17.994274 },
+    { lat: 59.337582, lng: 17.995171 },
+    { lat: 59.340746, lng: 17.998238 },
+    { lat: 59.341263, lng: 18.001992 },
+    { lat: 59.341801, lng: 18.004831 },
+    { lat: 59.341276, lng: 18.007712 },
+    { lat: 59.340796, lng: 18.012484 },
+    { lat: 59.340477, lng: 18.014751 },
+    { lat: 59.339857, lng: 18.017175 },
+    { lat: 59.339674, lng: 18.018374 },
+    { lat: 59.339592, lng: 18.023447 },
+    { lat: 59.339365, lng: 18.024772 },
+    { lat: 59.340594, lng: 18.025513 },
+    { lat: 59.341149, lng: 18.025374 },
+    { lat: 59.341173, lng: 18.025684 },
+    { lat: 59.341891, lng: 18.025423 },
+    { lat: 59.342558, lng: 18.025402 },
+    { lat: 59.343413, lng: 18.025679 },
+    { lat: 59.343915, lng: 18.026015 },
+    { lat: 59.344386, lng: 18.025351 },
+    { lat: 59.344564, lng: 18.026104 },
+    { lat: 59.344861, lng: 18.026806 },
+    { lat: 59.346647, lng: 18.029413 },
+    { lat: 59.347524, lng: 18.031029 },
+    { lat: 59.347882, lng: 18.030308 },
+    { lat: 59.347981, lng: 18.030317 },
+    { lat: 59.348496, lng: 18.032128 },
+    { lat: 59.348538, lng: 18.032372 },
+    { lat: 59.348276, lng: 18.032639 },
+    { lat: 59.348658, lng: 18.033994 },
+    { lat: 59.348910, lng: 18.033744 },
+    { lat: 59.349433, lng: 18.035600 },
+    { lat: 59.349632, lng: 18.035385 },
+    { lat: 59.351131, lng: 18.040708 },
+    { lat: 59.350931, lng: 18.040924 },
+    { lat: 59.350822, lng: 18.040536 },
+    { lat: 59.350906, lng: 18.041303 },
+    { lat: 59.351083, lng: 18.041874 },
+    { lat: 59.350058, lng: 18.042857 },
+    { lat: 59.350182, lng: 18.043294 },
+    { lat: 59.351563, lng: 18.044635 },
+    { lat: 59.352086, lng: 18.044947 },
+    { lat: 59.353538, lng: 18.044810 },
+    { lat: 59.354169, lng: 18.044924 },
+    { lat: 59.354399, lng: 18.045043 },
+    { lat: 59.354667, lng: 18.045376 },
+    { lat: 59.355114, lng: 18.046488 },
+    { lat: 59.356309, lng: 18.048570 },
+    { lat: 59.356744, lng: 18.048970 },
+    { lat: 59.357218, lng: 18.048995 },
+    { lat: 59.365535, lng: 18.043577 },
+    { lat: 59.368520, lng: 18.038810 },
+    { lat: 59.369820, lng: 18.037137 },
+    { lat: 59.370871, lng: 18.036910 },
+    { lat: 59.371415, lng: 18.036390 },
+    { lat: 59.372227, lng: 18.043056 },
+    { lat: 59.372580, lng: 18.043504 },
+    { lat: 59.373630, lng: 18.042932 },
+    { lat: 59.374347, lng: 18.042988 },
+    { lat: 59.375011, lng: 18.043765 },
+    { lat: 59.375801, lng: 18.048562 },
+    { lat: 59.375452, lng: 18.055170 },
+    { lat: 59.375497, lng: 18.058741 },
+    { lat: 59.374779, lng: 18.071111 },
+    { lat: 59.371849, lng: 18.077984 },
+    { lat: 59.369742, lng: 18.095484 },
+    { lat: 59.360053, lng: 18.111202 },
+    { lat: 59.357801, lng: 18.112562 },
+    { lat: 59.347658, lng: 18.126171 },
+    { lat: 59.344331, lng: 18.138138 },
+    { lat: 59.334597, lng: 18.160556 },
+    { lat: 59.328226, lng: 18.160356 },
+    { lat: 59.325333, lng: 18.163893 },
+    { lat: 59.320843, lng: 18.160317 },
+    { lat: 59.319816, lng: 18.157170 },
+    { lat: 59.318659, lng: 18.149247 },
+    { lat: 59.319524, lng: 18.144481 },
+    { lat: 59.320233, lng: 18.138573 },
+    { lat: 59.319572, lng: 18.133355 },
+    { lat: 59.319646, lng: 18.129430 },
+    { lat: 59.318448, lng: 18.126829 },
+    { lat: 59.318041, lng: 18.124370 },
+    { lat: 59.318515, lng: 18.120352 },
+    { lat: 59.317874, lng: 18.116484 },
+    { lat: 59.317504, lng: 18.112488 },
+    { lat: 59.317532, lng: 18.110241 },
+    { lat: 59.317680, lng: 18.109328 },
+    { lat: 59.315107, lng: 18.108591 }
+  ],
+  holes: []
+};
+
+/** Stockholm Essingeleden-öarna (Stora + Lilla Essingen). */
+export const STOCKHOLM_ESSINGELEDEN_POLYGON: Polygon = {
+  outer: [
+    { lat: 59.318597, lng: 17.997579 },
+    { lat: 59.316429, lng: 17.986893 },
+    { lat: 59.313997, lng: 17.974196 },
+    { lat: 59.320505, lng: 17.978340 },
+    { lat: 59.329644, lng: 17.991126 },
+    { lat: 59.327537, lng: 17.997050 },
+    { lat: 59.327949, lng: 18.001357 },
+    { lat: 59.327035, lng: 18.006100 },
+    { lat: 59.323756, lng: 18.014844 },
+    { lat: 59.323051, lng: 18.015785 },
+    { lat: 59.322122, lng: 18.011419 },
+    { lat: 59.318597, lng: 17.997579 }
+  ],
+  holes: []
+};
+
+// =============================================================================
 // STOCKHOLM — 61 kontrollpunkter fördelade på 22 betalstationer
 // =============================================================================
 
