@@ -170,7 +170,7 @@ function Index() {
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground text-balance max-w-3xl leading-[1.15]">
             Know what your trip really costs —{" "}
-            <span className="bg-gradient-hero bg-clip-text text-transparent pb-1 inline-block">
+            <span className="text-primary">
               before you drive.
             </span>
           </h1>
