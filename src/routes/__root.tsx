@@ -35,7 +35,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "TripCost — Fuel & Charging Cost Calculator for Sweden" },
+      { title: "Costra — Fuel & Charging Cost Calculator for Sweden" },
       {
         name: "description",
         content:
@@ -44,16 +44,16 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#0d1220" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "TripCost" },
-      { property: "og:title", content: "TripCost — Trip Cost Calculator for Sweden" },
+      { name: "apple-mobile-web-app-title", content: "Costra" },
+      { property: "og:title", content: "Costra — Trip Cost Calculator for Sweden" },
       { property: "og:description", content: "Fuel, charging & congestion tax in one estimate." },
       { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/icon-192.png" },
-      { rel: "icon", href: "/icon-512.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "icon", href: "/icon-192.png", type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
@@ -91,7 +91,7 @@ function RootComponent() {
           </main>
           <footer className="border-t border-border/70 bg-background/60">
             <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-              <p>© {new Date().getFullYear()} TripCost. Estimates only — verify with your provider.</p>
+              <p>© {new Date().getFullYear()} Costra. Estimates only — verify with your provider.</p>
               <p className="flex items-center gap-3">
                 <span>Routing by OpenRouteService</span>
                 <span>·</span>
