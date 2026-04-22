@@ -168,9 +168,9 @@ function Index() {
               Live Swedish congestion tax + ORS routing
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground text-balance max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground text-balance max-w-3xl leading-[1.15]">
             Know what your trip really costs —{" "}
-            <span className="bg-gradient-hero bg-clip-text text-transparent">
+            <span className="bg-gradient-hero bg-clip-text text-transparent pb-1 inline-block">
               before you drive.
             </span>
           </h1>
