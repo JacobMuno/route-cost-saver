@@ -12,12 +12,16 @@ export function AppHeader() {
           <img
             src={logoLight}
             alt="Costra"
-            className="h-7 w-auto block dark:hidden"
+            width={1272}
+            height={258}
+            className="h-7 w-auto object-contain shrink-0 block dark:hidden"
           />
           <img
             src={logoDark}
             alt="Costra"
-            className="h-7 w-auto hidden dark:block"
+            width={1362}
+            height={313}
+            className="h-7 w-auto object-contain shrink-0 hidden dark:block"
           />
         </Link>
 
